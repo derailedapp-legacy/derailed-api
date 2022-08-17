@@ -19,10 +19,7 @@ def create_token(user_id: str, user_password: str) -> str:
     return signer.sign(user_id).decode()
 
 
-async def verify_token(token: str | None) -> User:
-    if token is None:
-        raise HTTPException(401, 'Unauthorized')
-
+async def verify_token(token: str) -> User:
     fragmented = token.split('.')
     encoded_user_id = fragmented[0]
 

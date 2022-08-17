@@ -8,10 +8,12 @@ from typing import Any
 
 from argon2 import PasswordHasher
 from argon2.exceptions import VerificationError
-from fastapi import APIRouter, Header, HTTPException
+from fastapi import APIRouter, Depends, Header, HTTPException
 from pydantic import BaseModel, EmailStr, Field
 
 from capture.database import Settings, User, create_token, verify_token
+from capture.depends import get_user
+from capture.exceptions import NoAuthorizationError
 from capture.identifier import make_snowflake
 
 ph = PasswordHasher()
@@ -85,17 +87,19 @@ async def register(model: Register) -> dict:
 
 
 @router.get('/users/@me', status_code=200)
-async def get_current_user(authorization: str | None = Header(None)) -> dict:
-    user = await verify_token(authorization)
+async def get_current_user(user: User | None = Depends(get_user)) -> dict:
+    if user is None:
+        raise NoAuthorizationError()
 
     return user.dict(exclude=['password'])
 
 
 @router.patch('/users/@me', status_code=200)
 async def patch_current_user(
-    model: PatchUser, authorization: str | None = Header(None)
+    model: PatchUser, user: User | None = Depends(get_user)
 ) -> dict:
-    user = await verify_token(authorization)
+    if user is None:
+        raise NoAuthorizationError()
 
     if model.email:
         user.email = model.email
@@ -119,10 +123,9 @@ async def patch_current_user(
 
 
 @router.post('/users/@me/delete', status_code=200)
-async def delete_current_user(
-    model: DeleteUser, authorization: str | None = Header(None)
-):
-    user = await verify_token(authorization)
+async def delete_current_user(model: DeleteUser, user: User | None = Depends(get_user)):
+    if user is None:
+        raise NoAuthorizationError()
 
     try:
         ph.verify(user.password, model.password)
@@ -136,5 +139,5 @@ async def delete_current_user(
 
 
 @router.post('/genshin-impact', status_code=204)
-async def science(model: Analytic, authorization: str | None = Header(None)):
+async def science(model: Analytic, user: User | None = Depends(get_user)):
     return ''

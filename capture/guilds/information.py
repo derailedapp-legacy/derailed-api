@@ -5,10 +5,12 @@
 # Sharing of any piece of code to any unauthorized third-party is not allowed.
 from typing import Literal
 
-from fastapi import APIRouter, Header, HTTPException
+from fastapi import APIRouter, Depends, Header, HTTPException
 from pydantic import BaseModel
 
-from capture.database import Channel, Guild, Member, get_date, verify_token
+from capture.database import Channel, Guild, Member, User, get_date, verify_token
+from capture.depends import get_user
+from capture.exceptions import NoAuthorizationError
 
 router = APIRouter()
 
@@ -25,9 +27,10 @@ class ModifyGuild(BaseModel):
 
 @router.post('/guilds', status_code=201)
 async def create_guild(
-    model: CreateGuild, authorization: str | None = Header(None)
+    model: CreateGuild, user: User | None = Depends(get_user)
 ) -> dict:
-    user = await verify_token(authorization)
+    if user is None:
+        raise NoAuthorizationError()
 
     guild = Guild(
         name=model.name,
@@ -44,8 +47,9 @@ async def create_guild(
 
 
 @router.get('/guilds/{guild_id}', status_code=200)
-async def get_guild(guild_id: str, authorization: str | None = Header(None)) -> dict:
-    user = await verify_token(authorization)
+async def get_guild(guild_id: str, user: User | None = Depends(get_user)) -> dict:
+    if user is None:
+        raise NoAuthorizationError()
 
     member = await Member.find_one(
         Member.user_id == user.id, Member.guild_id == guild_id
@@ -71,8 +75,9 @@ async def get_guild_preview(guild_id: str) -> dict:
 
 
 @router.delete('/guilds/{guild_id}', status_code=204)
-async def delete_guild(guild_id: str, authorization: str | None = Header(None)) -> dict:
-    user = await verify_token(authorization)
+async def delete_guild(guild_id: str, user: User | None = Depends(get_user)) -> dict:
+    if user is None:
+        raise NoAuthorizationError()
 
     guild = await Guild.find_one(Guild.id == guild_id)
 
