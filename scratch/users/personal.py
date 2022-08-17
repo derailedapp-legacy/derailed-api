@@ -8,10 +8,10 @@ from typing import Any
 
 from argon2 import PasswordHasher
 from argon2.exceptions import VerificationError
-from fastapi import APIRouter, Depends, Header, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, EmailStr, Field
 
-from scratch.database import Settings, User, create_token, verify_token
+from scratch.database import Settings, User, create_token
 from scratch.depends import get_user
 from scratch.exceptions import NoAuthorizationError
 from scratch.identifier import make_snowflake
@@ -72,12 +72,12 @@ async def register(model: Register) -> dict:
     user_id = make_snowflake()
 
     user = User(
-        user_id=user_id,
+        id=user_id,
         email=model.email,
         username=model.username,
         password=ph.hash(model.password),
     )
-    settings = Settings(user_id=user_id)
+    settings = Settings(id=user_id)
     await user.insert()
     await settings.insert()
 

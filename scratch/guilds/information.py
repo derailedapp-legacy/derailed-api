@@ -5,12 +5,14 @@
 # Sharing of any piece of code to any unauthorized third-party is not allowed.
 from typing import Literal
 
-from fastapi import APIRouter, Depends, Header, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 
-from scratch.database import Channel, Guild, Member, User, get_date, verify_token
+from scratch.database import Channel, Guild, Member, Settings, User, get_date
 from scratch.depends import get_user
 from scratch.exceptions import NoAuthorizationError
+
+from ..identifier import make_snowflake
 
 router = APIRouter()
 
@@ -32,7 +34,9 @@ async def create_guild(
     if user is None:
         raise NoAuthorizationError()
 
+    # TODO: Create default channels
     guild = Guild(
+        id=make_snowflake(),
         name=model.name,
         default_message_notification_level=model.default_message_notification_level
         if model.default_message_notification_level is not None
@@ -42,6 +46,9 @@ async def create_guild(
     member = Member(user_id=user.id, guild_id=guild.id, joined_at=get_date())
     await guild.insert()
     await member.insert()
+
+    settings = await Settings.find_one(Settings.id == user.id)
+    settings.guild_positions.append(guild.id)
 
     return guild.dict()
 

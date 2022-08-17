@@ -29,6 +29,7 @@ async def on_startup():
     await database.connect()
     app.include_router(guilds.information.router)
     app.include_router(users.personal.router)
+    app.include_router(users.settings.router)
 
 
 if __name__ == '__main__':
