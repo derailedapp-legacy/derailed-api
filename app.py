@@ -1,6 +1,6 @@
-# The Telescope API
+# The Itch API
 #
-# Copyright 2022 Telescope Inc. All rights reserved.
+# Copyright 2022 Itch. All rights reserved.
 #
 # Sharing of any piece of code to any unauthorized third-party is not allowed.
 import os
@@ -11,7 +11,7 @@ from fastapi import FastAPI
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 
-from capture import database, guilds, rate_limit, users
+from scratch import database, guilds, rate_limit, users
 
 load_dotenv()
 app = FastAPI(openapi_url=None, redoc_url=None, docs_url=None)

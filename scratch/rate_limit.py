@@ -1,6 +1,6 @@
-# The Telescope API
+# The Itch API
 #
-# Copyright 2022 Telescope Inc. All rights reserved.
+# Copyright 2022 Itch. All rights reserved.
 #
 # Sharing of any piece of code to any unauthorized third-party is not allowed.
 import os
@@ -9,8 +9,8 @@ from fastapi import Depends, Request
 from slowapi import Limiter
 from slowapi.util import get_ipaddr
 
-from capture.database import User
-from capture.depends import get_user
+from scratch.database import User
+from scratch.depends import get_user
 
 
 async def get_rate_limit_key(

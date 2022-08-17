@@ -1,7 +1,7 @@
 [tool.poetry]
-name = "telescope-api"
+name = "itch-api"
 version = "1.0.0"
-description = "Telescope's API for processing requests"
+description = "Itch's API for processing requests"
 authors = ["VincentRPS <vincentbusiness55@gmail.com>"]
 
 [tool.isort]

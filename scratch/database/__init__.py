@@ -1,5 +1,5 @@
 """
-Telescope Database Configuration and Models
+Itch Database Configuration and Models
 """
 from .authorization import *
 from .engine import *

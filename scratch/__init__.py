@@ -1,5 +1,5 @@
 """
-The Telescope API
+The Itch API
 """
 from .database import *
 from .guilds import *

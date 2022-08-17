@@ -1,6 +1,6 @@
-# The Telescope API
+# The Itch API
 #
-# Copyright 2022 Telescope Inc. All rights reserved.
+# Copyright 2022 Itch. All rights reserved.
 #
 # Sharing of any piece of code to any unauthorized third-party is not allowed.
 import os

@@ -1,6 +1,6 @@
-# The Telescope API
+# The Itch API
 #
-# Copyright 2022 Telescope Inc. All rights reserved.
+# Copyright 2022 Itch. All rights reserved.
 #
 # Sharing of any piece of code to any unauthorized third-party is not allowed.
 from random import randint
@@ -11,10 +11,10 @@ from argon2.exceptions import VerificationError
 from fastapi import APIRouter, Depends, Header, HTTPException
 from pydantic import BaseModel, EmailStr, Field
 
-from capture.database import Settings, User, create_token, verify_token
-from capture.depends import get_user
-from capture.exceptions import NoAuthorizationError
-from capture.identifier import make_snowflake
+from scratch.database import Settings, User, create_token, verify_token
+from scratch.depends import get_user
+from scratch.exceptions import NoAuthorizationError
+from scratch.identifier import make_snowflake
 
 ph = PasswordHasher()
 

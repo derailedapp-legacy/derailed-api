@@ -1,6 +1,6 @@
-# The Telescope API
+# The Itch API
 #
-# Copyright 2022 Telescope Inc. All rights reserved.
+# Copyright 2022 Itch. All rights reserved.
 #
 # Sharing of any piece of code to any unauthorized third-party is not allowed.
 from typing import Literal
@@ -8,9 +8,9 @@ from typing import Literal
 from fastapi import APIRouter, Depends, Header, HTTPException
 from pydantic import BaseModel
 
-from capture.database import Channel, Guild, Member, User, get_date, verify_token
-from capture.depends import get_user
-from capture.exceptions import NoAuthorizationError
+from scratch.database import Channel, Guild, Member, User, get_date, verify_token
+from scratch.depends import get_user
+from scratch.exceptions import NoAuthorizationError
 
 router = APIRouter()
 
