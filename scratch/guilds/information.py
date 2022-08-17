@@ -49,6 +49,7 @@ async def create_guild(
 
     settings = await Settings.find_one(Settings.id == user.id)
     settings.guild_positions.append(guild.id)
+    settings.save()
 
     return guild.dict()
 
