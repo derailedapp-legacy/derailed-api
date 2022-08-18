@@ -1,5 +1,5 @@
 """
-Itch Database Configuration and Models
+Derailed Database Configuration and Models
 """
 from .authorization import *
 from .engine import *

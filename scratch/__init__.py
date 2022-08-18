@@ -1,5 +1,5 @@
 """
-The Itch API
+The Derailed API
 """
 from .database import *
 from .guilds import *

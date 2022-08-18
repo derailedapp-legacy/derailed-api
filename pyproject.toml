@@ -1,7 +1,7 @@
 [tool.poetry]
-name = "itch-api"
+name = "derailed-api"
 version = "1.0.0"
-description = "Itch's API for processing requests"
+description = "Derailed's API for processing requests"
 authors = ["VincentRPS <vincentbusiness55@gmail.com>"]
 
 [tool.isort]
