@@ -18,7 +18,6 @@ from scratch.identifier import make_snowflake
 
 ph = PasswordHasher()
 
-
 router = APIRouter(tags=['User'])
 
 

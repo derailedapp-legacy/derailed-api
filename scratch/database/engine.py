@@ -9,13 +9,12 @@ from datetime import datetime, timezone
 from beanie import init_beanie
 from motor.motor_asyncio import AsyncIOMotorClient
 
-from .models import Channel, Guild, Member, User
+from .models import Profile, Settings, User
 
 DOCUMENT_MODELS = [
     User,
-    Guild,
-    Member,
-    Channel,
+    Settings,
+    Profile,
 ]
 
 

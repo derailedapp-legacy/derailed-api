@@ -11,7 +11,7 @@ from fastapi import FastAPI
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 
-from scratch import database, guilds, rate_limit, users
+from scratch import database, rate_limit, users
 
 load_dotenv()
 app = FastAPI(openapi_url=None, redoc_url=None, docs_url=None)
@@ -27,7 +27,6 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 @app.on_event('startup')
 async def on_startup():
     await database.connect()
-    app.include_router(guilds.information.router)
     app.include_router(users.personal.router)
     app.include_router(users.settings.router)
 

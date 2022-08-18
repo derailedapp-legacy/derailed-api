@@ -14,7 +14,7 @@ from scratch.exceptions import NoAuthorizationError
 
 router = APIRouter()
 
-# TODO: allow the user to use guild_positions
+
 class EditSettings(BaseModel):
     status: Literal['online', 'dnd', 'afk', 'invisible'] | None
     theme: Literal['dark', 'light'] | None
