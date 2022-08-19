@@ -75,7 +75,7 @@ async def register(model: Register) -> dict:
         email=model.email,
         username=model.username,
         password=ph.hash(model.password),
-        discriminator=await find_discriminator(username=model.username)
+        discriminator=await find_discriminator(username=model.username),
     )
     settings = Settings(id=user_id)
     await user.insert()
