@@ -3,6 +3,7 @@
 # Copyright 2022 Derailed. All rights reserved.
 #
 # Sharing of any piece of code to any unauthorized third-party is not allowed.
+import os
 from random import randint
 from typing import Any
 
@@ -25,6 +26,7 @@ class Register(BaseModel):
     email: EmailStr
     username: str = Field(min_length=1, max_length=200)
     password: str = Field(min_length=1, max_length=128)
+    pbp: str
 
 
 class PatchUser(BaseModel):
@@ -63,6 +65,9 @@ async def find_discriminator(username: str) -> str:
 
 @router.post('/register', status_code=201)
 async def register(model: Register) -> dict:
+    if model.pbp != os.environ['PRIVATE_BETA_PASSWORD']:
+        raise HTTPException(403, 'Incorrect beta password')
+
     usage = await User.find(User.username == model.username).count()
 
     if usage == 9000:
