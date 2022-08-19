@@ -4,6 +4,7 @@ itsdangerous==2.1.2
 sentry-sdk==1.9.5
 beanie==1.11.7
 slowapi==0.1.5
+aiokafka==0.7.2
 python-dotenv==0.20.0
 email-validator==1.2.1
 uvicorn[standard]==0.18.2

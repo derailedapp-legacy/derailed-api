@@ -6,9 +6,12 @@
 import os
 from datetime import datetime, timezone
 
+from aiokafka import AIOKafkaProducer
 from beanie import init_beanie
 from motor.motor_asyncio import AsyncIOMotorClient
+from msgspec import msgpack
 
+from .event import Message
 from .models import Profile, Settings, User
 
 DOCUMENT_MODELS = [
@@ -29,3 +32,16 @@ async def connect() -> None:
 
 def get_date() -> datetime:
     return datetime.now(timezone.utc)
+
+
+producer: AIOKafkaProducer | None = None
+
+
+async def produce(topic: str, event: Message) -> None:
+    if producer is None:
+        global producer
+
+        producer = AIOKafkaProducer(bootstrap_servers=os.getenv('KAFKA_URI'))
+        await producer.start()
+
+    await producer.send(topic=topic, value=msgpack.encode(event))

@@ -8,7 +8,7 @@ from typing import Literal
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 
-from scratch.database import Settings, User
+from scratch.database import Message, Settings, User, produce
 from scratch.depends import get_user
 from scratch.exceptions import NoAuthorizationError
 
@@ -48,5 +48,8 @@ async def patch_settings(
         settings.theme = model.theme
 
     await settings.save()
+    settings_data = settings.dict(exclude={'id'})
 
-    return settings.dict(exclude={'id'})
+    await produce('user', Message('SETTINGS_UPDATE', settings_data, user_id=user.id))
+
+    return settings_data

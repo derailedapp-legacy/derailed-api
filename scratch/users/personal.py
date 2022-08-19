@@ -12,7 +12,7 @@ from argon2.exceptions import VerificationError
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, EmailStr, Field
 
-from scratch.database import Settings, User, create_token
+from scratch.database import Message, Settings, User, create_token, produce
 from scratch.depends import get_user
 from scratch.exceptions import NoAuthorizationError
 from scratch.identifier import make_snowflake
@@ -109,9 +109,6 @@ async def patch_current_user(
     if model.email:
         user.email = model.email
 
-    if model.password:
-        user.password = ph.hash(model.password)
-
     if model.username:
         user.username = model.username
         exists = await User.find_one(
@@ -122,9 +119,19 @@ async def patch_current_user(
         if exists:
             user.discriminator = await find_discriminator(model.username)
 
+    if model.password:
+        user.password = ph.hash(model.password)
+
+        await produce('security', Message('USER_DISCONNECT', {}, user_id=user.id))
+
     await user.save()
 
-    return user.dict(exclude={'password'})
+    user_data = user.dict(exclude={'password'})
+
+    # TODO: Send this event to the users guilds
+    await produce('user', Message('USER_UPDATE', user_data, user_id=user.id))
+
+    return user_data
 
 
 @router.post('/users/@me/delete', status_code=200)
@@ -138,6 +145,8 @@ async def delete_current_user(model: DeleteUser, user: User | None = Depends(get
         raise HTTPException(403, 'Incorrect password entered')
 
     settings = await User.find_one(Settings.user_id == user.id)
+
+    await produce('security', Message('USER_DISCONNECT', {}, user_id=user.id))
 
     user.delete()
     settings.delete()
