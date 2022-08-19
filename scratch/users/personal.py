@@ -22,13 +22,13 @@ router = APIRouter(tags=['User'])
 
 
 class Register(BaseModel):
-    email: EmailStr = Field(min_length=5, max_length=128)
+    email: EmailStr
     username: str = Field(min_length=1, max_length=200)
     password: str = Field(min_length=1, max_length=128)
 
 
 class PatchUser(BaseModel):
-    email: EmailStr | None = Field(min_length=5, max_length=128)
+    email: EmailStr
     username: str | None = Field(min_length=1, max_length=200)
     password: str | None = Field(min_length=1, max_length=128)
 
@@ -75,12 +75,13 @@ async def register(model: Register) -> dict:
         email=model.email,
         username=model.username,
         password=ph.hash(model.password),
+        discriminator=await find_discriminator(username=model.username)
     )
     settings = Settings(id=user_id)
     await user.insert()
     await settings.insert()
 
-    formatted_user = user.dict(exclude=['password'])
+    formatted_user = user.dict(exclude={'password'})
     formatted_user['token'] = create_token(user_id=user_id, user_password=user.password)
     return formatted_user
 
@@ -90,7 +91,7 @@ async def get_current_user(user: User | None = Depends(get_user)) -> dict:
     if user is None:
         raise NoAuthorizationError()
 
-    return user.dict(exclude=['password'])
+    return user.dict(exclude={'password'})
 
 
 @router.patch('/users/@me', status_code=200)
@@ -118,7 +119,7 @@ async def patch_current_user(
 
     await user.save()
 
-    return user.dict(exclude=['password'])
+    return user.dict(exclude={'password'})
 
 
 @router.post('/users/@me/delete', status_code=200)

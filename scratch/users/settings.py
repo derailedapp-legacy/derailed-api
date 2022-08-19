@@ -26,8 +26,7 @@ async def get_settings(user: User | None = Depends(get_user)) -> dict:
         raise NoAuthorizationError()
 
     settings = await Settings.find_one(Settings.id == user.id)
-
-    return settings.dict(exclude=['id'])
+    return settings.dict(exclude={'id'})
 
 
 @router.patch('/users/@me/settings')
@@ -40,7 +39,7 @@ async def patch_settings(
     settings = await Settings.find_one(Settings.id == user.id)
 
     if model.status and model.theme is None:
-        return settings.dict(exclude=['id'])
+        return settings.dict(exclude={'id'})
 
     if model.status:
         settings.status = model.status
@@ -50,4 +49,4 @@ async def patch_settings(
 
     await settings.save()
 
-    return settings.dict(exclude=['id'])
+    return settings.dict(exclude={'id'})
