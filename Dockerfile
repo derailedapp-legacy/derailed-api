@@ -5,7 +5,8 @@ RUN apk add --no-cache build-base libffi-dev
 
 WORKDIR /
 
-RUN poetry install
+RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir gunicorn
 
 COPY . .
 
