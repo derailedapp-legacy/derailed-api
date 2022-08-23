@@ -1,5 +1,5 @@
 """
-Derailed Database Configuration and Models
+Recorders Database Configuration and Models
 """
 from .authorization import *
 from .engine import *

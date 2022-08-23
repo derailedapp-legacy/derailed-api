@@ -1,7 +1,7 @@
 [tool.poetry]
-name = "derailed-api"
+name = "recorder-api"
 version = "1.0.0"
-description = "Derailed's API for processing requests"
+description = "Recorder's API for processing requests"
 authors = ["VincentRPS <vincentbusiness55@gmail.com>"]
 
 [tool.isort]
