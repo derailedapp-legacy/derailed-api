@@ -1,6 +1,6 @@
-# The Recorder API
+# The Derailed API
 #
-# Copyright 2022 Recorder, Inc. All rights reserved.
+# Copyright 2022 Derailed Inc. All rights reserved.
 #
 # Sharing of any piece of code to any unauthorized third-party is not allowed.
 import os
@@ -12,10 +12,10 @@ from argon2.exceptions import VerificationError
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, EmailStr, Field
 
-from scratch.database import Message, Settings, User, create_token, produce
-from scratch.depends import get_user
-from scratch.exceptions import NoAuthorizationError
-from scratch.identifier import make_snowflake
+from valve.database import Message, Settings, User, create_token, produce
+from valve.depends import get_user
+from valve.exceptions import NoAuthorizationError
+from valve.identifier import make_snowflake
 
 ph = PasswordHasher()
 

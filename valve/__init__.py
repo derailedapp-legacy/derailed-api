@@ -1,5 +1,5 @@
 """
-The Recorder API
+The Derailed API
 """
 from .database import *
 from .identifier import *

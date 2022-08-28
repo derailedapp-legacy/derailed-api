@@ -1,6 +1,6 @@
-# The Recorder API
+# The Derailed API
 #
-# Copyright 2022 Recorder, Inc. All rights reserved.
+# Copyright 2022 Derailed Inc. All rights reserved.
 #
 # Sharing of any piece of code to any unauthorized third-party is not allowed.
 import os
@@ -11,7 +11,7 @@ from fastapi import FastAPI
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 
-from scratch import database, rate_limit, users
+from valve import database, rate_limit, users
 
 load_dotenv()
 app = FastAPI(openapi_url=None, redoc_url=None, docs_url=None)

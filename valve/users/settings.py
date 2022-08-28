@@ -1,6 +1,6 @@
-# The Recorder API
+# The Derailed API
 #
-# Copyright 2022 Recorder, Inc. All rights reserved.
+# Copyright 2022 Derailed Inc. All rights reserved.
 #
 # Sharing of any piece of code to any unauthorized third-party is not allowed.
 from typing import Literal
@@ -8,9 +8,9 @@ from typing import Literal
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 
-from scratch.database import Message, Settings, User, produce
-from scratch.depends import get_user
-from scratch.exceptions import NoAuthorizationError
+from valve.database import Message, Settings, User, produce
+from valve.depends import get_user
+from valve.exceptions import NoAuthorizationError
 
 router = APIRouter()
 
