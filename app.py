@@ -3,15 +3,22 @@
 # Copyright 2022 Derailed Inc. All rights reserved.
 #
 # Sharing of any piece of code to any unauthorized third-party is not allowed.
+import contextlib
 import os
 
 import sentry_sdk
+
+with contextlib.suppress(ImportError):
+    import uvloop
+
+    uvloop.install()
+
 from dotenv import load_dotenv
 from fastapi import FastAPI
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 
-from valve import database, rate_limit, users
+from valve import database, etc, guilds, rate_limit, users
 
 load_dotenv()
 app = FastAPI(openapi_url=None, redoc_url=None, docs_url=None)
@@ -29,6 +36,10 @@ async def on_startup():
     await database.connect()
     app.include_router(users.personal.router)
     app.include_router(users.settings.router)
+    app.include_router(users.presence.router)
+    app.include_router(guilds.guild.router)
+    app.include_router(guilds.role.router)
+    app.include_router(etc.relationships.router)
 
 
 if __name__ == '__main__':

@@ -35,7 +35,7 @@ class CreateRole(BaseModel):
 class ModifyRole(BaseModel):
     name: str | None = Field(None, max_length=128)
     hoist: bool | None = Field(None)
-    position: int | None = Field(None, max_digits=200)
+    position: int | None = Field(None)
 
 
 @router.get('/guilds/{guild_id}/roles', status_code=200)

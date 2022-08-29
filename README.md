@@ -1,7 +1,10 @@
 # Valve
-Hey! sorry for the repo being a bit ugly currently. 
-I am trying to modernize everything and get it up to shape as a featureful API.
+Valve is Derailed's EPIC API created by the LIGHTING FAST python and fastapi libraries.
 
-# docker-compose when?
-I am going to be making one soon.
-I just have no experience with docker-compose so it's really hard to make something for it for the API.
+Derailed's entire servic is powered with Valve because we're dumb.
+and we want you to be too!
+
+Just take a glance of the code, squawk at the worst design you've ever seen and fix it all in one PR.
+
+## Testing
+Just use our docker-compose smh.

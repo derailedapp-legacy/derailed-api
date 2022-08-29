@@ -38,7 +38,9 @@ async def create_guild(
         description=model.description,
         nsfw=model.nsfw,
     )
-    role = Role(id=guild.id, name='everyone', permissions=0, position=1)
+    role = Role(
+        id=guild.id, name='everyone', permissions=0, position=1, guild_id=guild.id
+    )
     member = Member(
         user_id=user.id,
         guild_id=guild.id,
@@ -50,7 +52,7 @@ async def create_guild(
     await member.insert()
     await role.insert()
 
-    dmember = member.dict(exclude={'user_id'})
+    dmember = member.dict(exclude={'user_id', 'id'})
     dmember['user'] = user.dict(exclude={'email', 'password', 'verification'})
 
     await produce('guild', Message('GUILD_CREATE', guild.dict(), user_id=user.id))

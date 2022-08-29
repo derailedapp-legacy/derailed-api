@@ -12,7 +12,7 @@ from motor.motor_asyncio import AsyncIOMotorClient
 from msgspec import msgpack
 
 from .event import Message
-from .models import Guild, Member, Profile, Relationship, Role, Settings, User
+from .models import Guild, Member, Presence, Profile, Relationship, Role, Settings, User
 
 DOCUMENT_MODELS = [
     User,
@@ -22,6 +22,7 @@ DOCUMENT_MODELS = [
     Member,
     Role,
     Relationship,
+    Presence,
 ]
 
 
@@ -32,20 +33,14 @@ async def connect() -> None:
         document_models=DOCUMENT_MODELS,
         allow_index_dropping=True,
     )
+    global producer
+    producer = AIOKafkaProducer(bootstrap_servers=os.getenv('KAFKA_URI'))
+    await producer.start()
 
 
 def get_date() -> datetime:
     return datetime.now(timezone.utc)
 
 
-producer: AIOKafkaProducer | None = None
-
-
 async def produce(topic: str, event: Message) -> None:
-    if producer is None:
-        global producer
-
-        producer = AIOKafkaProducer(bootstrap_servers=os.getenv('KAFKA_URI'))
-        await producer.start()
-
     await producer.send(topic=topic, value=msgpack.encode(event))

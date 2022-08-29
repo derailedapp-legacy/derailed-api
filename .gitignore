@@ -1,4 +1,5 @@
 poetry.lock
 test
 .env
+.data
 __pycache__/

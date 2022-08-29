@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "recorder-api"
+name = "derailed-api"
 version = "1.0.0"
 description = "Derailed's API for processing requests"
 authors = ["VincentRPS <vincentbusiness55@gmail.com>"]
@@ -23,6 +23,7 @@ python-dotenv = "^0.20.0"
 email-validator = "^1.2.1"
 uvicorn = {extras = ["standard"], version = "^0.18.2"}
 aiokafka = "^0.7.2"
+msgspec = "^0.8.0"
 
 [tool.poetry.dev-dependencies]
 black = "^22.6.0"
