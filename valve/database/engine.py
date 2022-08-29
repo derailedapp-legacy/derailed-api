@@ -12,12 +12,16 @@ from motor.motor_asyncio import AsyncIOMotorClient
 from msgspec import msgpack
 
 from .event import Message
-from .models import Profile, Settings, User
+from .models import Guild, Member, Profile, Relationship, Role, Settings, User
 
 DOCUMENT_MODELS = [
     User,
     Settings,
     Profile,
+    Guild,
+    Member,
+    Role,
+    Relationship,
 ]
 
 

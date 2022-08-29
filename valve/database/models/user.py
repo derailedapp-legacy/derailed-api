@@ -33,3 +33,9 @@ class Settings(Document):
     status: str = 'online'
     theme: Literal['dark', 'light'] = 'dark'
     client_status: Literal['desktop', 'mobile', 'web', 'tui'] = None
+
+
+class Relationship(Document):
+    user_id: str
+    target_id: str
+    type: int
