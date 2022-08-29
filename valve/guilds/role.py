@@ -3,7 +3,7 @@
 # Copyright 2022 Derailed Inc. All rights reserved.
 #
 # Sharing of any piece of code to any unauthorized third-party is not allowed.
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
@@ -34,6 +34,47 @@ class ModifyRole(BaseModel):
     name: str | None = Field(None, max_length=128)
     hoist: bool | None = Field(None)
     position: int | None = Field(None, max_digits=200)
+
+
+@router.get('/guilds/{guild_id}/roles', status_code=200)
+async def get_guild_roles(
+    guild_id: str, user: User | None = Depends(get_user)
+) -> list[Role]:
+    if user is None:
+        raise NoAuthorizationError()
+
+    is_member = await Member.find_one(
+        Member.guild_id == guild_id, Member.user_id == user.id
+    ).exists()
+
+    if not is_member:
+        raise HTTPException(403, 'You are not a member of this guild')
+
+    roles = await Role.find(Role.guild_id == guild_id).to_list()
+
+    return roles
+
+
+@router.get('/guilds/{guild_id}/roles/{role_id}', status_code=200)
+async def get_guild_role(
+    guild_id: str, role_id: str, user: User | None = Depends(get_user)
+) -> list[Role]:
+    if user is None:
+        raise NoAuthorizationError()
+
+    is_member = await Member.find_one(
+        Member.guild_id == guild_id, Member.user_id == user.id
+    ).exists()
+
+    if not is_member:
+        raise HTTPException(403, 'You are not a member of this guild')
+
+    role = await Role.find_one(Role.guild_id == guild_id, Role.id == role_id)
+
+    if TYPE_CHECKING:
+        assert role
+
+    return role
 
 
 @router.post('/guilds/{guild_id}/roles', status_code=201)
