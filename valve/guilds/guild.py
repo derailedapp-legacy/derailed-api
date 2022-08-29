@@ -48,7 +48,7 @@ async def create_guild(
     )
     await guild.insert()
     await member.insert()
-    role.insert()
+    await role.insert()
 
     return guild.dict()
 
