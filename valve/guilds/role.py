@@ -100,7 +100,7 @@ async def get_position(guild_id: str, role: Role, position: int) -> None:
         else:
             await grole.update(position=grole.position - 1)
 
-    role.update(position=position)
+    await role.update(position=position)
 
 
 @router.patch('/guilds/{guild_id}/roles/{role_id}', status_code=200)
