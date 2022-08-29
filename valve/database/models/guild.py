@@ -25,3 +25,13 @@ class Member(Document):
     guild_id: str
     nick: str | None
     joined_at: datetime
+    role_ids: list[str]
+
+
+class Role(Document):
+    id: str
+    guild_id: str
+    name: str
+    hoist: bool = False
+    permissions: int
+    position: int

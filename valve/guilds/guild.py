@@ -6,7 +6,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
 
-from valve.database import Guild, Member, User, get_date
+from valve.database import Guild, Member, Role, User, get_date
 from valve.depends import get_user
 from valve.exceptions import NoAuthorizationError
 from valve.identifier import make_snowflake
@@ -38,9 +38,17 @@ async def create_guild(
         description=model.description,
         nsfw=model.nsfw,
     )
-    member = Member(user_id=user.id, guild_id=guild.id, nick=None, joined_at=get_date())
+    role = Role(id=guild.id, name='everyone', permissions=0, position=1)
+    member = Member(
+        user_id=user.id,
+        guild_id=guild.id,
+        nick=None,
+        joined_at=get_date(),
+        role_ids=[role.id],
+    )
     await guild.insert()
     await member.insert()
+    role.insert()
 
     return guild.dict()
 
@@ -50,7 +58,9 @@ async def get_guild(guild_id: str, user: User | None = Depends(get_user)) -> dic
     if user is None:
         raise NoAuthorizationError()
 
-    is_member = await Member.find_one(Member.user_id == user.id, Member.guild_id == guild_id).exists()
+    is_member = await Member.find_one(
+        Member.user_id == user.id, Member.guild_id == guild_id
+    ).exists()
 
     if is_member is False:
         raise HTTPException(403, 'You are not a member of this guild')
@@ -60,11 +70,15 @@ async def get_guild(guild_id: str, user: User | None = Depends(get_user)) -> dic
 
 
 @router.get('/{guild_id}/preview', status_code=200)
-async def get_guild_preview(guild_id: str, user: User | None = Depends(get_user)) -> dict:
+async def get_guild_preview(
+    guild_id: str, user: User | None = Depends(get_user)
+) -> dict:
     if user is None:
         raise NoAuthorizationError()
 
-    is_member = await Member.find_one(Member.user_id == user.id, Member.guild_id == guild_id).exists()
+    is_member = await Member.find_one(
+        Member.user_id == user.id, Member.guild_id == guild_id
+    ).exists()
 
     if is_member is False:
         raise HTTPException(403, 'You are not a member of this guild')
@@ -97,6 +111,7 @@ async def modify_guild(
     await guild.update(**model.dict())
 
     return guild.dict()
+
 
 @router.delete('/{guild_id}', status_code=204)
 async def delete_guild(guild_id: str, user: User | None = Depends(get_user)) -> str:
