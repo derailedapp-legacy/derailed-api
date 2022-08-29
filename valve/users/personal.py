@@ -12,7 +12,7 @@ from argon2.exceptions import VerificationError
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, EmailStr, Field
 
-from valve.database import Message, Settings, User, create_token, produce
+from valve.database import Message, Presence, Settings, User, create_token, produce
 from valve.depends import get_user
 from valve.exceptions import NoAuthorizationError
 from valve.identifier import make_snowflake
@@ -83,8 +83,10 @@ async def register(model: Register) -> dict:
         discriminator=await find_discriminator(username=model.username),
     )
     settings = Settings(id=user_id)
+    presence = Presence(id=user.id, status='offline', content=None, timestamp=None)
     await user.insert()
     await settings.insert()
+    await presence.insert()
 
     formatted_user = user.dict(exclude={'password'})
     formatted_user['token'] = create_token(user_id=user_id, user_password=user.password)

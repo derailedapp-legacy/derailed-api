@@ -8,7 +8,7 @@ from typing import Literal
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 
-from valve.database import Message, Settings, User, produce
+from valve.database import Message, Presence, Settings, User, produce
 from valve.depends import get_user
 from valve.exceptions import NoAuthorizationError
 
@@ -43,6 +43,12 @@ async def patch_settings(
 
     if model.status:
         settings.status = model.status
+
+        presence = await Presence.find_one(Presence.id == settings.id)
+        if presence.timestamp:
+            await presence.update(
+                status=model.status if model.status != 'invisible' else 'offline'
+            )
 
     if model.theme:
         settings.theme = model.theme
