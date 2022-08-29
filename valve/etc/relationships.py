@@ -8,10 +8,9 @@ from typing import Literal
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 
-from valve.database import Relationship, User
+from valve.database import Message, Relationship, User, produce
 from valve.depends import get_user
 from valve.exceptions import NoAuthorizationError
-from valve.users.personal import delete_current_user
 
 router = APIRouter()
 
@@ -96,6 +95,19 @@ async def create_relationship(
                     )
                     await current_relationship.insert()
 
+                await produce(
+                    'relationships',
+                    Message(
+                        'RELATIONSHIP_ACCEPT', {'user_id': user_id}, user_id=user.id
+                    ),
+                )
+                await produce(
+                    'relationships',
+                    Message(
+                        'RELATIONSHIP_ACCEPT', {'user_id': user.id}, user_id=user_id
+                    ),
+                )
+
             elif current_relationship.type == 2:
                 raise HTTPException(400, 'This user has blocked you.')
 
@@ -110,6 +122,13 @@ async def create_relationship(
 
         current_relationship = Relationship(user_id=user.id, target_id=user_id, type=2)
         await current_relationship.insert()
+
+        await produce(
+            'relationships',
+            Message(
+                'RELATIONSHIP_CREATE', {'user_id': user_id, 'type': 2}, user_id=user.id
+            ),
+        )
 
     return ''
 
@@ -139,5 +158,10 @@ async def delete_relationship(
         await target_relationship.delete()
 
     await current_relationship.delete()
+
+    await produce(
+        'relationships',
+        Message('RELATIONSHIP_DELETE', {'user_id': user_id}, user_id=user.id),
+    )
 
     return ''

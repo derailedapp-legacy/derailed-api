@@ -6,7 +6,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
 
-from valve.database import Guild, Member, Role, User, get_date
+from valve.database import Guild, Member, Message, Role, User, get_date, produce
 from valve.depends import get_user
 from valve.exceptions import NoAuthorizationError
 from valve.identifier import make_snowflake
@@ -49,6 +49,14 @@ async def create_guild(
     await guild.insert()
     await member.insert()
     await role.insert()
+
+    dmember = member.dict(exclude={'user_id'})
+    dmember['user'] = user.dict(exclude={'email', 'password', 'verification'})
+
+    await produce('guild', Message('GUILD_CREATE', guild.dict(), user_id=user.id))
+    await produce(
+        'guild', Message('GUILD_JOIN', dmember, user_id=user.id, guild_id=guild.id)
+    )
 
     return guild.dict()
 
@@ -110,7 +118,9 @@ async def modify_guild(
 
     await guild.update(**model.dict())
 
-    return guild.dict()
+    data = guild.dict()
+    await produce('guild', Message('GUILD_EDIT', data, guild_id=guild_id))
+    return data
 
 
 @router.delete('/{guild_id}', status_code=204)
@@ -135,6 +145,16 @@ async def delete_guild(guild_id: str, user: User | None = Depends(get_user)) -> 
 
     async for member in members:
         await member.delete()
+        # TODO: only have one event to delete this guild from all gateway caches
+        await produce(
+            'guild',
+            Message(
+                'GUILD_LEAVE',
+                {'guild_id': guild.id},
+                user_id=member.user_id,
+                guild_id=guild.id,
+            ),
+        )
 
     await guild.delete()
 

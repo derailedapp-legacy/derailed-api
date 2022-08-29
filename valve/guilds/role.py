@@ -11,10 +11,12 @@ from pydantic import BaseModel, Field
 from valve.database import (
     Guild,
     Member,
+    Message,
     Role,
     User,
     get_highest_role,
     get_member_permissions,
+    produce,
 )
 from valve.depends import get_user
 from valve.exceptions import NoAuthorizationError
@@ -114,7 +116,10 @@ async def create_role(
     )
     await role.insert()
 
-    return role.dict()
+    data = role.dict()
+
+    await produce('guild', Message('ROLE_CREATE', data, guild_id=guild_id))
+    return data
 
 
 async def get_position(guild_id: str, role: Role, position: int) -> None:
@@ -193,11 +198,14 @@ async def modify_role(
 
     await role.update(**updates)
 
-    return role.dict()
+    data = role.dict()
+
+    await produce('guild', Message('ROLE_EDIT', data, guild_id=guild_id))
+    return data
 
 
 @router.delete('/guilds/{guild_id}/roles/{role_id}', status_code=204)
-async def delete_guild(
+async def delete_guild_role(
     guild_id: str, role_id: str, user: User | None = Depends(get_user)
 ) -> str:
     if user is None:
@@ -239,4 +247,6 @@ async def delete_guild(
 
     await role.delete()
 
-    return role
+    await produce('guild', Message('ROLE_DELETE', {'id': role.id}, guild_id=guild_id))
+
+    return ''
