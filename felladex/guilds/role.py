@@ -1,6 +1,6 @@
-# The Derailed API
+# The Felladex API
 #
-# Copyright 2022 Derailed Inc. All rights reserved.
+# Copyright 2022 Felladex Inc. All rights reserved.
 #
 # Sharing of any piece of code to any unauthorized third-party is not allowed.
 from typing import TYPE_CHECKING, Any
@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING, Any
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
 
-from valve.database import (
+from felladex.database import (
     Guild,
     Member,
     Message,
@@ -18,10 +18,10 @@ from valve.database import (
     get_member_permissions,
     produce,
 )
-from valve.depends import get_user
-from valve.exceptions import NoAuthorizationError
-from valve.identifier import make_snowflake
-from valve.permissions import RolePermissionEnum, has_bit
+from felladex.depends import get_user
+from felladex.exceptions import NoAuthorizationError
+from felladex.identifier import make_snowflake
+from felladex.permissions import RolePermissionEnum, has_bit
 
 router = APIRouter()
 

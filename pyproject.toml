@@ -1,7 +1,7 @@
 [tool.poetry]
-name = "derailed-api"
+name = "felladex-api"
 version = "1.0.0"
-description = "Derailed's API for processing requests"
+description = "FD's API for processing requests"
 authors = ["VincentRPS <vincentbusiness55@gmail.com>"]
 
 [tool.isort]

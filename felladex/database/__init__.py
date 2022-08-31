@@ -1,5 +1,5 @@
 """
-Derailed's Database Configuration and Models
+Felladex's Database Configuration and Models
 """
 from .authorization import *
 from .engine import *

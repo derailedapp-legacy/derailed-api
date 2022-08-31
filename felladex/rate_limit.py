@@ -1,6 +1,6 @@
-# The Derailed API
+# The Felladex API
 #
-# Copyright 2022 Derailed Inc. All rights reserved.
+# Copyright 2022 Felladex Inc. All rights reserved.
 #
 # Sharing of any piece of code to any unauthorized third-party is not allowed.
 import os
@@ -9,8 +9,8 @@ from fastapi import Depends, Request
 from slowapi import Limiter
 from slowapi.util import get_ipaddr
 
-from valve.database import User
-from valve.depends import get_user
+from felladex.database import User
+from felladex.depends import get_user
 
 
 async def get_rate_limit_key(

@@ -1,13 +1,13 @@
-# The Derailed API
+# The Felladex API
 #
-# Copyright 2022 Derailed Inc. All rights reserved.
+# Copyright 2022 Felladex Inc. All rights reserved.
 #
 # Sharing of any piece of code to any unauthorized third-party is not allowed.
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, overload
 
-from valve.database import Member, Role
-from valve.permissions import PermissionValue, combine_role_permission_values
+from felladex.database import Member, Role
+from felladex.permissions import PermissionValue, combine_role_permission_values
 
 
 async def get_member_roles(user_id: str, guild_id: str) -> list[Role]:
@@ -23,6 +23,16 @@ async def get_member_roles(user_id: str, guild_id: str) -> list[Role]:
         roles.append(await Role.find_one(Role.id == role_id))
 
     return roles
+
+
+@overload
+async def get_member_permissions(user_id: str, guild_id: str) -> int:
+    pass
+
+
+@overload
+async def get_member_permissions(user_id: str, guild_id: str) -> tuple[int, int]:
+    pass
 
 
 async def get_member_permissions(

@@ -1,15 +1,25 @@
-# The Derailed API
+# The Felladex API
 #
-# Copyright 2022 Derailed Inc. All rights reserved.
+# Copyright 2022 Felladex Inc. All rights reserved.
 #
 # Sharing of any piece of code to any unauthorized third-party is not allowed.
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
 
-from valve.database import Guild, Member, Message, Role, User, get_date, produce
-from valve.depends import get_user
-from valve.exceptions import NoAuthorizationError
-from valve.identifier import make_snowflake
+from felladex.database import (
+    Guild,
+    Member,
+    Message,
+    Role,
+    User,
+    get_date,
+    get_member_permissions,
+    produce,
+)
+from felladex.depends import get_user
+from felladex.exceptions import NoAuthorizationError
+from felladex.identifier import make_snowflake
+from felladex.permissions import RolePermissionEnum, has_bit
 
 router = APIRouter(prefix='/guilds')
 
@@ -115,8 +125,14 @@ async def modify_guild(
     if guild is None:
         raise HTTPException(404, 'Guild does not exist')
 
-    if guild.owner_id != user.id:
-        raise HTTPException(403, 'You are not the guild owner')
+    permissions = await get_member_permissions(user_id=user.id, guild_id=guild_id)
+
+    guild = await Guild.find_one(Guild.id == guild_id)
+
+    is_owner = user.id == guild.owner_id
+
+    if not has_bit(permissions, RolePermissionEnum.MODIFY_GUILD.value) and not is_owner:
+        raise HTTPException(403, 'Invalid permissions')
 
     await guild.update(**model.dict())
 

@@ -1,6 +1,6 @@
-# The Derailed API
+# The Felladex API
 #
-# Copyright 2022 Derailed Inc. All rights reserved.
+# Copyright 2022 Felladex Inc. All rights reserved.
 #
 # Sharing of any piece of code to any unauthorized third-party is not allowed.
 import os
@@ -12,10 +12,18 @@ from argon2.exceptions import VerificationError
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, EmailStr, Field
 
-from valve.database import Message, Presence, Settings, User, create_token, produce
-from valve.depends import get_user
-from valve.exceptions import NoAuthorizationError
-from valve.identifier import make_snowflake
+from felladex.database import (
+    Message,
+    Presence,
+    Profile,
+    Settings,
+    User,
+    create_token,
+    produce,
+)
+from felladex.depends import get_user
+from felladex.exceptions import NoAuthorizationError
+from felladex.identifier import make_snowflake
 
 ph = PasswordHasher()
 
@@ -36,6 +44,10 @@ class PatchUser(BaseModel):
 
 class DeleteUser(BaseModel):
     password: str | None = Field(min_length=1, max_length=128)
+
+
+class Login(DeleteUser):
+    email: EmailStr
 
 
 class Analytic(BaseModel):
@@ -80,13 +92,30 @@ async def register(model: Register) -> dict:
     )
     settings = Settings(id=user_id)
     presence = Presence(id=user.id, status='offline', content=None, timestamp=None)
+    profile = Profile(id=user.id, bio=None)
     await user.insert()
     await settings.insert()
     await presence.insert()
+    await profile.insert()
 
     formatted_user = user.dict(exclude={'password'})
     formatted_user['token'] = create_token(user_id=user_id, user_password=user.password)
     return formatted_user
+
+
+@router.post('/login', status_code=200)
+async def login(model: Login) -> dict:
+    user = await User.find_one(User.email == model.email)
+
+    if user is None:
+        raise HTTPException(400, 'Invalid email entered')
+
+    try:
+        ph.verify(user.password, model.password)
+    except VerificationError:
+        raise HTTPException(403, 'Incorrect password entered')
+
+    return {'token': create_token(user_id=user.id, user_password=user.password)}
 
 
 @router.get('/users/@me', status_code=200)
@@ -154,4 +183,29 @@ async def delete_current_user(model: DeleteUser, user: User | None = Depends(get
 
 @router.post('/genshin-impact', status_code=204)
 async def science(model: Analytic, user: User | None = Depends(get_user)):
+    if user is None:
+        raise NoAuthorizationError()
+
     return ''
+
+
+@router.post('/profiles/@me', status_code=200)
+async def science(user: User | None = Depends(get_user)):
+    if user is None:
+        raise NoAuthorizationError()
+
+    profile = await Profile.find_one(Profile.id == user.id)
+    return profile.dict(exclude={'id'})
+
+
+@router.post('/profiles/{user_id}', status_code=200)
+async def science(user_id: str, user: User | None = Depends(get_user)):
+    if user is None:
+        raise NoAuthorizationError()
+
+    profile = await Profile.find_one(Profile.id == user_id)
+
+    if profile is None:
+        raise HTTPException(404, 'User does not exist')
+
+    return profile.dict(exclude={'id'})

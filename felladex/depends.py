@@ -1,11 +1,11 @@
-# The Derailed API
+# The Felladex API
 #
-# Copyright 2022 Derailed Inc. All rights reserved.
+# Copyright 2022 Felladex Inc. All rights reserved.
 #
 # Sharing of any piece of code to any unauthorized third-party is not allowed.
 from fastapi import Header
 
-from valve.database import User, verify_token
+from felladex.database import User, verify_token
 
 
 async def get_user(authorization: str | None = Header(None)) -> User | None:

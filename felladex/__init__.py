@@ -1,5 +1,5 @@
 """
-The Derailed API
+The Felladex API
 """
 from .database import *
 from .identifier import *

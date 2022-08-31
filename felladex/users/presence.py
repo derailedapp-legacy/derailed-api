@@ -1,14 +1,14 @@
-# The Derailed API
+# The Felladex API
 #
-# Copyright 2022 Derailed Inc. All rights reserved.
+# Copyright 2022 Felladex Inc. All rights reserved.
 #
 # Sharing of any piece of code to any unauthorized third-party is not allowed.
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel, Field
 
-from valve.database import Message, Presence, User, produce
-from valve.depends import get_user
-from valve.exceptions import NoAuthorizationError
+from felladex.database import Message, Presence, User, produce
+from felladex.depends import get_user
+from felladex.exceptions import NoAuthorizationError
 
 router = APIRouter()
 

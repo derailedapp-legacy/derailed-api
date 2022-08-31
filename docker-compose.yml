@@ -1,10 +1,10 @@
 networks:
-  derailedapinet:
+  felladexapinet:
     driver: bridge
 
 services:
   api:
-    container_name: derailed-api
+    container_name: felladex-api
     restart: always
     depends_on:
       - redis
@@ -17,14 +17,14 @@ services:
       context: .
       dockerfile: Dockerfile
     networks:
-      - derailedapinet
+      - felladexapinet
 
   redis:
     image: eqalpha/keydb
     ports:
       - "6379:6379"
     networks:
-      - derailedapinet
+      - felladexapinet
 
   mongo:
     image: mongo
@@ -33,7 +33,7 @@ services:
     volumes:
       - ./.data/db:/data/db
     networks:
-      - derailedapinet
+      - felladexapinet
 
   zookeeper:
     image: 'bitnami/zookeeper:latest'
@@ -42,7 +42,7 @@ services:
     ports:
       - "2181:2181"
     networks:
-      - derailedapinet
+      - felladexapinet
 
   kafka:
     image: 'bitnami/kafka:latest'
@@ -58,4 +58,4 @@ services:
     ports:
       - "9092:9092"
     networks:
-      - derailedapinet
+      - felladexapinet
