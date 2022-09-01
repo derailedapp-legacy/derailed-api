@@ -1,6 +1,6 @@
-# The Felladex API
+# The Vincent.chat API
 #
-# Copyright 2022 Felladex Inc. All rights reserved.
+# Copyright 2022 Vincent.chat Inc. All rights reserved.
 #
 # Sharing of any piece of code to any unauthorized third-party is not allowed.
 import contextlib
@@ -18,7 +18,7 @@ from fastapi import FastAPI
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 
-from felladex import database, etc, guilds, rate_limit, users
+from vincentchatapi import database, etc, guilds, rate_limit, users
 
 load_dotenv()
 app = FastAPI(openapi_url=None, redoc_url=None, docs_url=None)

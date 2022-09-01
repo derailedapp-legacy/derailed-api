@@ -1,6 +1,6 @@
-# The Felladex API
+# The Vincent.chat API
 #
-# Copyright 2022 Felladex Inc. All rights reserved.
+# Copyright 2022 Vincent.chat Inc. All rights reserved.
 #
 # Sharing of any piece of code to any unauthorized third-party is not allowed.
 from typing import Literal
@@ -8,9 +8,9 @@ from typing import Literal
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 
-from felladex.database import Message, Relationship, User, produce
-from felladex.depends import get_user
-from felladex.exceptions import NoAuthorizationError
+from vincentchatapi.database import Message, Relationship, User, produce
+from vincentchatapi.depends import get_user
+from vincentchatapi.exceptions import NoAuthorizationError
 
 router = APIRouter()
 

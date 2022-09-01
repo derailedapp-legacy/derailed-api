@@ -1,5 +1,5 @@
 """
-Felladex's Database Configuration and Models
+Vincent.chat's Database Configuration and Models
 """
 from .authorization import *
 from .engine import *

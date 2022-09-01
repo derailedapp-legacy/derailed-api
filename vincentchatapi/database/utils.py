@@ -1,13 +1,13 @@
-# The Felladex API
+# The Vincent.chat API
 #
-# Copyright 2022 Felladex Inc. All rights reserved.
+# Copyright 2022 Vincent.chat Inc. All rights reserved.
 #
 # Sharing of any piece of code to any unauthorized third-party is not allowed.
 
 from typing import TYPE_CHECKING, overload
 
-from felladex.database import Member, Role
-from felladex.permissions import PermissionValue, combine_role_permission_values
+from vincentchatapi.database import Member, Role
+from vincentchatapi.permissions import PermissionValue, combine_role_permission_values
 
 
 async def get_member_roles(user_id: str, guild_id: str) -> list[Role]:

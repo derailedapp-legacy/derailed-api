@@ -1,7 +1,7 @@
 [tool.poetry]
-name = "felladex-api"
+name = "vincent-api"
 version = "1.0.0"
-description = "FD's API for processing requests"
+description = "Vincent.chat's API for processing requests"
 authors = ["VincentRPS <vincentbusiness55@gmail.com>"]
 
 [tool.isort]

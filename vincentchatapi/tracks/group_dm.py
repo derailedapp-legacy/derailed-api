@@ -1,16 +1,16 @@
-# The Felladex API
+# The Vincent.chat API
 #
-# Copyright 2022 Felladex Inc. All rights reserved.
+# Copyright 2022 Vincent.chat Inc. All rights reserved.
 #
 # Sharing of any piece of code to any unauthorized third-party is not allowed.
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
 
-from felladex.database import Relationship, Track, User, produce
-from felladex.database.event import Message
-from felladex.depends import get_user
-from felladex.exceptions import NoAuthorizationError
-from felladex.identifier import make_snowflake
+from vincentchatapi.database import Relationship, Track, User, produce
+from vincentchatapi.database.event import Message
+from vincentchatapi.depends import get_user
+from vincentchatapi.exceptions import NoAuthorizationError
+from vincentchatapi.identifier import make_snowflake
 
 router = APIRouter()
 

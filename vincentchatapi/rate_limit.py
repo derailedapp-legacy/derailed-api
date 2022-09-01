@@ -1,6 +1,6 @@
-# The Felladex API
+# The Vincent.chat API
 #
-# Copyright 2022 Felladex Inc. All rights reserved.
+# Copyright 2022 Vincent.chat Inc. All rights reserved.
 #
 # Sharing of any piece of code to any unauthorized third-party is not allowed.
 import os
@@ -9,8 +9,8 @@ from fastapi import Depends, Request
 from slowapi import Limiter
 from slowapi.util import get_ipaddr
 
-from felladex.database import User
-from felladex.depends import get_user
+from vincentchatapi.database import User
+from vincentchatapi.depends import get_user
 
 
 async def get_rate_limit_key(
