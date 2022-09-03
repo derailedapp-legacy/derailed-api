@@ -6,8 +6,8 @@
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
 
-from derailed.database import Relationship, Track, User, produce
-from derailed.database.event import Message
+from derailed.database import Relationship, Track, User, get_track_dict, produce
+from derailed.database.event import Event
 from derailed.depends import get_user
 from derailed.exceptions import NoAuthorizationError
 from derailed.identifier import make_snowflake
@@ -52,13 +52,9 @@ async def create_group_dm(
     )
     await track.insert()
 
-    track_data = track.dict(exclude={'position', 'nsfw', 'parent_id', 'overwrites'})
-
-    await produce('track', Message('GROUP_TRACK_CREATE', track_data, user_id=user.id))
+    track_data = get_track_dict(track=track)
 
     for user_id in track.members:
-        await produce(
-            'track', Message('GROUP_TRACK_CREATE', track_data, user_id=user_id)
-        )
+        await produce('track', Event('GROUP_TRACK_CREATE', track_data, user_id=user_id))
 
     return track_data

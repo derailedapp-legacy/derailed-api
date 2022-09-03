@@ -11,7 +11,7 @@ from beanie import init_beanie
 from motor.motor_asyncio import AsyncIOMotorClient
 from msgspec import msgpack
 
-from .event import Message
+from .event import Event
 from .models import Guild, Member, Presence, Profile, Relationship, Role, Settings, User
 
 DOCUMENT_MODELS = [
@@ -42,5 +42,5 @@ def get_date() -> datetime:
     return datetime.now(timezone.utc)
 
 
-async def produce(topic: str, event: Message) -> None:
+async def produce(topic: str, event: Event) -> None:
     await producer.send(topic=topic, value=msgpack.encode(event))

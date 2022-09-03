@@ -8,7 +8,7 @@ from typing import Literal
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 
-from derailed.database import Message, Relationship, User, produce
+from derailed.database import Event, Relationship, User, produce
 from derailed.depends import get_user
 from derailed.exceptions import NoAuthorizationError
 
@@ -97,15 +97,11 @@ async def create_relationship(
 
                 await produce(
                     'relationships',
-                    Message(
-                        'RELATIONSHIP_ACCEPT', {'user_id': user_id}, user_id=user.id
-                    ),
+                    Event('RELATIONSHIP_ACCEPT', {'user_id': user_id}, user_id=user.id),
                 )
                 await produce(
                     'relationships',
-                    Message(
-                        'RELATIONSHIP_ACCEPT', {'user_id': user.id}, user_id=user_id
-                    ),
+                    Event('RELATIONSHIP_ACCEPT', {'user_id': user.id}, user_id=user_id),
                 )
 
             elif current_relationship.type == 2:
@@ -125,7 +121,7 @@ async def create_relationship(
 
         await produce(
             'relationships',
-            Message(
+            Event(
                 'RELATIONSHIP_CREATE', {'user_id': user_id, 'type': 2}, user_id=user.id
             ),
         )
@@ -161,7 +157,7 @@ async def delete_relationship(
 
     await produce(
         'relationships',
-        Message('RELATIONSHIP_DELETE', {'user_id': user_id}, user_id=user.id),
+        Event('RELATIONSHIP_DELETE', {'user_id': user_id}, user_id=user.id),
     )
 
     return ''

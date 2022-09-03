@@ -3,7 +3,6 @@
 # Copyright 2022 Derailed Inc. All rights reserved.
 #
 # Sharing of any piece of code to any unauthorized third-party is not allowed.
-import os
 from random import randint
 from typing import Any
 
@@ -13,7 +12,9 @@ from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, EmailStr, Field
 
 from derailed.database import (
-    Message,
+    Event,
+    Guild,
+    Member,
     Presence,
     Profile,
     Settings,
@@ -149,14 +150,14 @@ async def patch_current_user(
     if model.password:
         user.password = ph.hash(model.password)
 
-        await produce('security', Message('USER_DISCONNECT', {}, user_id=user.id))
+        await produce('security', Event('USER_DISCONNECT', {}, user_id=user.id))
 
     await user.save()
 
     user_data = user.dict(exclude={'password'})
 
     # TODO: Send this event to the users guilds
-    await produce('user', Message('USER_UPDATE', user_data, user_id=user.id))
+    await produce('user', Event('USER_UPDATE', user_data, user_id=user.id))
 
     return user_data
 
@@ -171,9 +172,26 @@ async def delete_current_user(model: DeleteUser, user: User | None = Depends(get
     except VerificationError:
         raise HTTPException(403, 'Incorrect password entered')
 
+    guilds = Member.find(Member.user_id == user.id)
+
+    async for guild_member in guilds:
+        guild = await Guild.find_one(Guild.id == guild_member.guild_id)
+
+        if guild.owner_id == user.id:
+            raise HTTPException(403, 'You are still an owner of a guild')
+
+    await guilds.delete()
+
+    [
+        await produce(
+            'guild', Event('MEMBER_LEAVE', {'user_id': user.id, 'guild_id': guild.id})
+        )
+        async for guild in guilds
+    ]
+
     settings = await User.find_one(Settings.user_id == user.id)
 
-    await produce('security', Message('USER_DISCONNECT', {}, user_id=user.id))
+    await produce('security', Event('USER_DISCONNECT', {}, user_id=user.id))
 
     user.delete()
     settings.delete()

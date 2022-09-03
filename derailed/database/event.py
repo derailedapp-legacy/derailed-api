@@ -8,7 +8,7 @@ from typing import Any
 from msgspec import Struct
 
 
-class Message(Struct):
+class Event(Struct):
     name: str
     data: dict[str, Any]
     user_id: str | None = None

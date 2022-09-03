@@ -8,7 +8,17 @@ from typing import Any
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
 
-from derailed.database import Guild, Track, User, get_member_permissions
+from derailed.database import (
+    Guild,
+    Message,
+    Pin,
+    Track,
+    User,
+    get_member_permissions,
+    get_track_dict,
+    produce,
+)
+from derailed.database.event import Event
 from derailed.depends import get_user
 from derailed.exceptions import NoAuthorizationError
 from derailed.permissions import RolePermissionEnum, has_bit
@@ -47,6 +57,8 @@ async def modify_track(
             and not is_owner
         ):
             raise HTTPException(403, 'Invalid permissions')
+    elif user.id not in track.members:
+        raise HTTPException(403, 'You are not a member of this track')
 
     updates: dict[str, Any] = {}
 
@@ -58,7 +70,15 @@ async def modify_track(
 
     await track.update(**updates)
 
-    return track.dict()
+    track_data = get_track_dict(track=track)
+
+    if track.guild_id:
+        await produce(
+            'track',
+            Event('TRACK_MODIFY', track_data, guild_id=track.guild_id),
+        )
+
+    return track_data
 
 
 @router.delete('/tracks/{track_id}', status_code=204)
@@ -91,9 +111,21 @@ async def delete_track(track_id: str, user: User | None = Depends(get_user)) -> 
 
         if track.members == []:
             await track.delete()
+
+            messages = Message.find(Message.track_id == track.id)
+            pins = Pin.find(Pin.origin == track.id)
+
+            await messages.delete()
+            await pins.delete()
         else:
             await track.update()
     else:
         await track.delete()
+
+        messages = Message.find(Message.track_id == track.id)
+        pins = Pin.find(Pin.origin == track.id)
+
+        await messages.delete()
+        await pins.delete()
 
     return ''

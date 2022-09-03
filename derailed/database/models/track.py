@@ -5,6 +5,7 @@
 # Sharing of any piece of code to any unauthorized third-party is not allowed.
 
 from datetime import datetime
+from typing import Literal
 
 from beanie import Document
 from pydantic import BaseModel
@@ -25,7 +26,7 @@ class Track(Document):
     name: str | None
     topic: str | None
     position: str | None
-    type: int
+    type: Literal[0, 1, 2, 3]
     members: list[str] | None
     nsfw: bool | None
     last_message_id: str | None
@@ -46,4 +47,4 @@ class Message(Document):
 
 class Pin(Document):
     id: str
-    channel_id: str
+    origin: str

@@ -8,7 +8,7 @@ from typing import Literal
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 
-from derailed.database import Message, Presence, Settings, User, produce
+from derailed.database import Event, Presence, Settings, User, produce
 from derailed.depends import get_user
 from derailed.exceptions import NoAuthorizationError
 
@@ -56,6 +56,6 @@ async def patch_settings(
     await settings.save()
     settings_data = settings.dict(exclude={'id'})
 
-    await produce('user', Message('SETTINGS_UPDATE', settings_data, user_id=user.id))
+    await produce('user', Event('SETTINGS_UPDATE', settings_data, user_id=user.id))
 
     return settings_data

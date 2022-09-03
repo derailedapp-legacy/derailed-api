@@ -7,9 +7,9 @@ from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
 
 from derailed.database import (
+    Event,
     Guild,
     Member,
-    Message,
     Role,
     User,
     get_date,
@@ -65,9 +65,9 @@ async def create_guild(
     dmember = member.dict(exclude={'user_id', 'id'})
     dmember['user'] = user.dict(exclude={'email', 'password', 'verification'})
 
-    await produce('guild', Message('GUILD_CREATE', guild.dict(), user_id=user.id))
+    await produce('guild', Event('GUILD_CREATE', guild.dict(), user_id=user.id))
     await produce(
-        'guild', Message('GUILD_JOIN', dmember, user_id=user.id, guild_id=guild.id)
+        'guild', Event('GUILD_JOIN', dmember, user_id=user.id, guild_id=guild.id)
     )
 
     return guild.dict()
@@ -137,7 +137,7 @@ async def modify_guild(
     await guild.update(**model.dict())
 
     data = guild.dict()
-    await produce('guild', Message('GUILD_EDIT', data, guild_id=guild_id))
+    await produce('guild', Event('GUILD_EDIT', data, guild_id=guild_id))
     return data
 
 
@@ -166,7 +166,7 @@ async def delete_guild(guild_id: str, user: User | None = Depends(get_user)) -> 
         # TODO: only have one event to delete this guild from all gateway caches
         await produce(
             'guild',
-            Message(
+            Event(
                 'GUILD_LEAVE',
                 {'guild_id': guild.id},
                 user_id=member.user_id,

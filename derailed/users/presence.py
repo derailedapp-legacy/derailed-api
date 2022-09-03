@@ -6,7 +6,7 @@
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel, Field
 
-from derailed.database import Message, Presence, User, produce
+from derailed.database import Event, Presence, User, produce
 from derailed.depends import get_user
 from derailed.exceptions import NoAuthorizationError
 
@@ -29,7 +29,7 @@ async def put_presence(
     await presence.update(content=model.content)
 
     await produce(
-        'presences', Message('PRESENCE_UPDATE', presence.dict(), user_id=user.id)
+        'presences', Event('PRESENCE_UPDATE', presence.dict(), user_id=user.id)
     )
 
     return ''

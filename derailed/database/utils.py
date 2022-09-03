@@ -4,9 +4,9 @@
 #
 # Sharing of any piece of code to any unauthorized third-party is not allowed.
 
-from typing import TYPE_CHECKING, overload
+from typing import TYPE_CHECKING, Any, overload
 
-from derailed.database import Member, Role
+from derailed.database import Member, Role, Track
 from derailed.permissions import PermissionValue, combine_role_permission_values
 
 
@@ -64,3 +64,31 @@ async def get_highest_role(guild_id: str) -> Role:
             highest_role = role
 
     return highest_role
+
+
+def get_track_dict(track: Track) -> dict[str, Any]:
+    if track.type == 0:
+        return track.dict(
+            exclude={
+                'icon',
+                'members',
+                'last_message_id',
+                'parent_id',
+            }
+        )
+    elif track.type == 1:
+        return track.dict(
+            exclude={
+                'icon',
+                'members',
+            }
+        )
+    elif track.type in (2, 3):
+        return track.dict(
+            exclude={
+                'position',
+                'overwrites',
+                'nsfw',
+                'parent_id',
+            }
+        )

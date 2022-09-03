@@ -9,9 +9,9 @@ from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
 
 from derailed.database import (
+    Event,
     Guild,
     Member,
-    Message,
     Role,
     User,
     get_highest_role,
@@ -118,7 +118,7 @@ async def create_role(
 
     data = role.dict()
 
-    await produce('guild', Message('ROLE_CREATE', data, guild_id=guild_id))
+    await produce('guild', Event('ROLE_CREATE', data, guild_id=guild_id))
     return data
 
 
@@ -200,7 +200,7 @@ async def modify_role(
 
     data = role.dict()
 
-    await produce('guild', Message('ROLE_EDIT', data, guild_id=guild_id))
+    await produce('guild', Event('ROLE_EDIT', data, guild_id=guild_id))
     return data
 
 
@@ -247,6 +247,6 @@ async def delete_guild_role(
 
     await role.delete()
 
-    await produce('guild', Message('ROLE_DELETE', {'id': role.id}, guild_id=guild_id))
+    await produce('guild', Event('ROLE_DELETE', {'id': role.id}, guild_id=guild_id))
 
     return ''
