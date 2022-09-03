@@ -1,6 +1,6 @@
-# The Vincent.chat API
+# The Derailed API
 #
-# Copyright 2022 Vincent.chat Inc. All rights reserved.
+# Copyright 2022 Derailed Inc. All rights reserved.
 #
 # Sharing of any piece of code to any unauthorized third-party is not allowed.
 import contextlib
@@ -9,7 +9,7 @@ import os
 import sentry_sdk
 
 with contextlib.suppress(ImportError):
-    import uvloop
+    import uvloop  # type: ignore
 
     uvloop.install()
 
@@ -18,7 +18,7 @@ from fastapi import FastAPI
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 
-from vincentchatapi import database, etc, guilds, rate_limit, users
+from derailed import database, etc, guilds, rate_limit, users
 
 load_dotenv()
 app = FastAPI(openapi_url=None, redoc_url=None, docs_url=None)

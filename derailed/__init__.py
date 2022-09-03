@@ -1,5 +1,5 @@
 """
-The Vincent.chat API
+The Derailed API
 """
 from .database import *
 from .identifier import *

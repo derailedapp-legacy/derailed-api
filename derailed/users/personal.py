@@ -1,6 +1,6 @@
-# The Vincent.chat API
+# The Derailed API
 #
-# Copyright 2022 Vincent.chat Inc. All rights reserved.
+# Copyright 2022 Derailed Inc. All rights reserved.
 #
 # Sharing of any piece of code to any unauthorized third-party is not allowed.
 import os
@@ -12,7 +12,7 @@ from argon2.exceptions import VerificationError
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, EmailStr, Field
 
-from vincentchatapi.database import (
+from derailed.database import (
     Message,
     Presence,
     Profile,
@@ -21,9 +21,9 @@ from vincentchatapi.database import (
     create_token,
     produce,
 )
-from vincentchatapi.depends import get_user
-from vincentchatapi.exceptions import NoAuthorizationError
-from vincentchatapi.identifier import make_snowflake
+from derailed.depends import get_user
+from derailed.exceptions import NoAuthorizationError
+from derailed.identifier import make_snowflake
 
 ph = PasswordHasher()
 

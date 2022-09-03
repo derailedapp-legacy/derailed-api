@@ -1,10 +1,10 @@
 networks:
-  vincentapinet:
+  derailedapinet:
     driver: bridge
 
 services:
   api:
-    container_name: vincent-api
+    container_name: derailed-api
     restart: always
     depends_on:
       - redis
@@ -17,14 +17,14 @@ services:
       context: .
       dockerfile: Dockerfile
     networks:
-      - vincentapinet
+      - derailedapinet
 
   redis:
     image: eqalpha/keydb
     ports:
       - "6379:6379"
     networks:
-      - vincentapinet
+      - derailedapinet
 
   mongo:
     image: mongo
@@ -33,7 +33,7 @@ services:
     volumes:
       - ./.data/db:/data/db
     networks:
-      - vincentapinet
+      - derailedapinet
 
   zookeeper:
     image: 'bitnami/zookeeper:latest'
@@ -42,7 +42,7 @@ services:
     ports:
       - "2181:2181"
     networks:
-      - vincentapinet
+      - derailedapinet
 
   kafka:
     image: 'bitnami/kafka:latest'
@@ -58,4 +58,4 @@ services:
     ports:
       - "9092:9092"
     networks:
-      - vincentapinet
+      - derailedapinet

@@ -1,5 +1,5 @@
 """
-Vincent.chat's Database Configuration and Models
+Derailed's Database Configuration and Models
 """
 from .authorization import *
 from .engine import *
