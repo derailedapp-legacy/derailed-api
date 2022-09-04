@@ -19,7 +19,7 @@ class CreateRelationship(BaseModel):
     type: Literal[1, 2]
 
 
-@router.get('/relationships/relatable/{username}#{discriminator}')
+@router.get('/relationships/relatable')
 async def user_is_relatable(
     username: str, discriminator: str, user: User | None = Depends(get_user)
 ) -> dict:
