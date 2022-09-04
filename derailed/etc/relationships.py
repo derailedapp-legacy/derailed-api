@@ -50,7 +50,7 @@ async def user_is_relatable(
     return {'user_id': target_user.id, 'relatable': relatable}
 
 
-@router.post('/relationships/{user_id}', status_code=204)
+@router.put('/relationships/{user_id}', status_code=204)
 async def create_relationship(
     user_id: str, model: CreateRelationship, user: User | None = Depends(get_user)
 ) -> str:
