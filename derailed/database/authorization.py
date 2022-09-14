@@ -38,5 +38,5 @@ async def verify_token(token: str) -> User:
         signer.unsign(token)
 
         return user
-    except (itsdangerous.BadSignature):
+    except itsdangerous.BadSignature:
         raise HTTPException(401, 'Unauthorized')
