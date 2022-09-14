@@ -78,7 +78,7 @@ async def create_relationship(
         if current_relationship is not None:
             if current_relationship.type == 2:
                 raise HTTPException(400, 'You have this user blocked')
-            elif current_relationship.type == 1:
+            if current_relationship.type == 1:
                 raise HTTPException(
                     400, 'You cannot send another friend request to this user'
                 )
@@ -86,7 +86,7 @@ async def create_relationship(
         if target_relationship is not None:
             if target_relationship.type == 0:
                 raise HTTPException(400, 'You are already friends with this user')
-            elif target_relationship.type == 1:
+            if target_relationship.type == 1:
                 await target_relationship.update(type=0)
 
                 if current_relationship is None:
