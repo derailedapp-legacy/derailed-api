@@ -208,7 +208,7 @@ async def science(model: Analytic, user: User | None = Depends(get_user)):
 
 
 @router.post('/profiles/@me', status_code=200)
-async def science(user: User | None = Depends(get_user)):
+async def get_current_profile(user: User | None = Depends(get_user)):
     if user is None:
         raise NoAuthorizationError()
 
@@ -217,7 +217,7 @@ async def science(user: User | None = Depends(get_user)):
 
 
 @router.post('/profiles/{user_id}', status_code=200)
-async def science(user_id: str, user: User | None = Depends(get_user)):
+async def get_user_profile(user_id: str, user: User | None = Depends(get_user)):
     if user is None:
         raise NoAuthorizationError()
 
