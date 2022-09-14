@@ -4,7 +4,6 @@
 #
 # Sharing of any piece of code to any unauthorized third-party is not allowed.
 import base64
-import binascii
 
 import itsdangerous
 from fastapi import HTTPException
@@ -25,7 +24,7 @@ async def verify_token(token: str) -> User:
 
     try:
         user_id = base64.b64decode(encoded_user_id.encode()).decode()
-    except (ValueError, binascii.Error):
+    except ValueError:
         raise HTTPException(401, 'Unauthorized')
 
     user = await User.find_one(User.id == user_id)
