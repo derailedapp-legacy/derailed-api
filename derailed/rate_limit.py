@@ -27,3 +27,6 @@ def get_limiter() -> Limiter:
         strategy='fixed-window-elastic-expiry',
         storage_uri=os.getenv('STORAGE_URI'),
     )
+
+
+rate_limiter = get_limiter()

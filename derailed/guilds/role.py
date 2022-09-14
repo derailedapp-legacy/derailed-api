@@ -5,7 +5,7 @@
 # Sharing of any piece of code to any unauthorized third-party is not allowed.
 from typing import TYPE_CHECKING, Any
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel, Field
 
 from derailed.database import (
@@ -40,7 +40,7 @@ class ModifyRole(BaseModel):
 
 @router.get('/guilds/{guild_id}/roles', status_code=200)
 async def get_guild_roles(
-    guild_id: str, user: User | None = Depends(get_user)
+    guild_id: str, request: Request, user: User | None = Depends(get_user)
 ) -> list[Role]:
     if user is None:
         raise NoAuthorizationError()
@@ -59,7 +59,7 @@ async def get_guild_roles(
 
 @router.get('/guilds/{guild_id}/roles/{role_id}', status_code=200)
 async def get_guild_role(
-    guild_id: str, role_id: str, user: User | None = Depends(get_user)
+    guild_id: str, role_id: str, request: Request, user: User | None = Depends(get_user)
 ) -> list[Role]:
     if user is None:
         raise NoAuthorizationError()
@@ -81,7 +81,10 @@ async def get_guild_role(
 
 @router.post('/guilds/{guild_id}/roles', status_code=201)
 async def create_role(
-    guild_id: str, model: CreateRole, user: User | None = Depends(get_user)
+    guild_id: str,
+    model: CreateRole,
+    request: Request,
+    user: User | None = Depends(get_user),
 ) -> dict:
     if user is None:
         raise NoAuthorizationError()
@@ -154,6 +157,7 @@ async def modify_role(
     guild_id: str,
     role_id: str,
     model: ModifyRole,
+    request: Request,
     user: User | None = Depends(get_user),
 ) -> dict:
     if user is None:
@@ -206,7 +210,7 @@ async def modify_role(
 
 @router.delete('/guilds/{guild_id}/roles/{role_id}', status_code=204)
 async def delete_guild_role(
-    guild_id: str, role_id: str, user: User | None = Depends(get_user)
+    guild_id: str, role_id: str, request: Request, user: User | None = Depends(get_user)
 ) -> str:
     if user is None:
         raise NoAuthorizationError()

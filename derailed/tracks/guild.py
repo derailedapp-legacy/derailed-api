@@ -6,7 +6,7 @@
 
 from typing import Any
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 
 from derailed.database import Member, Track, User, get_track_dict
 from derailed.depends import get_user
@@ -17,7 +17,7 @@ router = APIRouter()
 
 @router.get('/guilds/{guild_id}/tracks')
 async def get_guild_tracks(
-    guild_id: str, user: User | None = Depends(get_user)
+    guild_id: str, request: Request, user: User | None = Depends(get_user)
 ) -> list[dict[str, Any]]:
     if user is None:
         raise NoAuthorizationError()
@@ -35,7 +35,10 @@ async def get_guild_tracks(
 
 @router.get('/guilds/{guild_id}/tracks/{track_id}')
 async def get_guild_track(
-    guild_id: str, track_id: str, user: User | None = Depends(get_user)
+    guild_id: str,
+    track_id: str,
+    request: Request,
+    user: User | None = Depends(get_user),
 ) -> dict[str, Any]:
     if user is None:
         raise NoAuthorizationError()

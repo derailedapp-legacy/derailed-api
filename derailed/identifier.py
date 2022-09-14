@@ -18,9 +18,7 @@ def make_snowflake() -> str:
     epoch = current_ms - EPOCH << 22
 
     curthread = threading.current_thread().ident
-    if (
-        curthread is None
-    ):
+    if curthread is None:
         raise AssertionError
 
     epoch |= (curthread % 32) << 17

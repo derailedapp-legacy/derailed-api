@@ -8,7 +8,7 @@ from typing import Any
 
 from argon2 import PasswordHasher
 from argon2.exceptions import VerificationError
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel, EmailStr, Field
 
 from derailed.database import (
@@ -76,7 +76,7 @@ async def find_discriminator(username: str) -> str:
 
 
 @router.post('/register', status_code=201)
-async def register(model: Register) -> dict:
+async def register(model: Register, request: Request) -> dict:
     usage = await User.find(User.username == model.username).count()
 
     if usage == 9000:
@@ -105,7 +105,7 @@ async def register(model: Register) -> dict:
 
 
 @router.post('/login', status_code=200)
-async def login(model: Login) -> dict:
+async def login(model: Login, request: Request) -> dict:
     user = await User.find_one(User.email == model.email)
 
     if user is None:
@@ -120,7 +120,9 @@ async def login(model: Login) -> dict:
 
 
 @router.get('/users/@me', status_code=200)
-async def get_current_user(user: User | None = Depends(get_user)) -> dict:
+async def get_current_user(
+    request: Request, user: User | None = Depends(get_user)
+) -> dict:
     if user is None:
         raise NoAuthorizationError()
 
@@ -129,7 +131,7 @@ async def get_current_user(user: User | None = Depends(get_user)) -> dict:
 
 @router.patch('/users/@me', status_code=200)
 async def patch_current_user(
-    model: PatchUser, user: User | None = Depends(get_user)
+    model: PatchUser, request: Request, user: User | None = Depends(get_user)
 ) -> dict:
     if user is None:
         raise NoAuthorizationError()
@@ -163,7 +165,9 @@ async def patch_current_user(
 
 
 @router.post('/users/@me/delete', status_code=200)
-async def delete_current_user(model: DeleteUser, user: User | None = Depends(get_user)):
+async def delete_current_user(
+    request: Request, model: DeleteUser, user: User | None = Depends(get_user)
+):
     if user is None:
         raise NoAuthorizationError()
 
@@ -200,7 +204,9 @@ async def delete_current_user(model: DeleteUser, user: User | None = Depends(get
 
 
 @router.post('/genshin-impact', status_code=204)
-async def science(model: Analytic, unused_user: User | None = Depends(get_user)):
+async def science(
+    model: Analytic, request: Request, unused_user: User | None = Depends(get_user)
+):
     if unused_user is None:
         raise NoAuthorizationError()
 
@@ -208,7 +214,7 @@ async def science(model: Analytic, unused_user: User | None = Depends(get_user))
 
 
 @router.post('/profiles/@me', status_code=200)
-async def get_current_profile(user: User | None = Depends(get_user)):
+async def get_current_profile(request: Request, user: User | None = Depends(get_user)):
     if user is None:
         raise NoAuthorizationError()
 
@@ -217,7 +223,9 @@ async def get_current_profile(user: User | None = Depends(get_user)):
 
 
 @router.post('/profiles/{user_id}', status_code=200)
-async def get_user_profile(user_id: str, user: User | None = Depends(get_user)):
+async def get_user_profile(
+    request: Request, user_id: str, user: User | None = Depends(get_user)
+):
     if user is None:
         raise NoAuthorizationError()
 

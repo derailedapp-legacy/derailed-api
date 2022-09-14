@@ -3,7 +3,7 @@
 # Copyright 2022 Derailed Inc. All rights reserved.
 #
 # Sharing of any piece of code to any unauthorized third-party is not allowed.
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Request
 from pydantic import BaseModel, Field
 
 from derailed.database import Event, Presence, User, produce
@@ -19,7 +19,7 @@ class PutPresence(BaseModel):
 
 @router.put('/users/@me/presence', status_code=204)
 async def put_presence(
-    model: PutPresence, user: User | None = Depends(get_user)
+    model: PutPresence, request: Request, user: User | None = Depends(get_user)
 ) -> str:
     if user is None:
         raise NoAuthorizationError()
