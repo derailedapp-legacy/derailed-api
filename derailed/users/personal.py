@@ -200,7 +200,7 @@ async def delete_current_user(model: DeleteUser, user: User | None = Depends(get
 
 
 @router.post('/genshin-impact', status_code=204)
-async def science(model: Analytic, user: User | None = Depends(get_user)):
+async def science(model: Analytic, unused_user: User | None = Depends(get_user)):
     if user is None:
         raise NoAuthorizationError()
 
