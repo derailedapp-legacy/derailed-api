@@ -73,9 +73,8 @@ async def get_guild_role(
 
     role = await Role.find_one(Role.guild_id == guild_id, Role.id == role_id)
 
-    if TYPE_CHECKING:
-        if not role:
-            raise AssertionError
+    if TYPE_CHECKING and not role:
+        raise AssertionError
 
     return role
 
