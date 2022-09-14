@@ -16,9 +16,8 @@ async def get_member_roles(user_id: str, guild_id: str) -> list[Role]:
         Member.user_id == user_id, Member.guild_id == guild_id
     )
 
-    if TYPE_CHECKING:
-        if member is None:
-            raise AssertionError
+    if TYPE_CHECKING and member is None:
+        raise AssertionError
 
     for role_id in member.role_ids:
         roles.append(await Role.find_one(Role.id == role_id))
