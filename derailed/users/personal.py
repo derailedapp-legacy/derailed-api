@@ -25,6 +25,7 @@ from derailed.database import (
 from derailed.depends import get_user
 from derailed.exceptions import NoAuthorizationError
 from derailed.identifier import make_snowflake
+from derailed.rate_limit import rate_limiter
 
 ph = PasswordHasher()
 
@@ -75,8 +76,17 @@ async def find_discriminator(username: str) -> str:
     raise HTTPException(400, 'Unable to find discriminator for this username')
 
 
+FORBIDDEN_USERNAMES = {
+    'derailed'
+}
+
+
 @router.post('/register', status_code=201)
+@rate_limiter.limit('1/minute')
 async def register(model: Register, request: Request) -> dict:
+    if model.username.lower() in FORBIDDEN_USERNAMES:
+        raise HTTPException(403, 'Forbidden username')
+
     usage = await User.find(User.username == model.username).count()
 
     if usage == 9000:

@@ -6,7 +6,7 @@
 import contextlib
 import os
 import threading
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import sentry_sdk
 
@@ -66,7 +66,10 @@ async def load_features() -> None:
                 f'(Feature Module missing data exception) {repr(mod.__name__)} is missing one of name, version, or creator.'
             )
 
-        mod.FEATURE_INFO['load_id'] = uuid4()
+        if TYPE_CHECKING:
+            mod.FEATURE_INFO: dict[str, Any] = {}
+
+        mod.FEATURE_INFO['load_id'] = str(uuid4())
 
         features.append(mod.FEATURE_INFO)
 
