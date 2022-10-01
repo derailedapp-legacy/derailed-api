@@ -1,11 +1,7 @@
-networks:
-  derailedapinet:
-    driver: bridge
-
 services:
   api:
     container_name: derailed-api
-    restart: always
+    restart: unless-stopped
     depends_on:
       - redis
       - mongo
@@ -16,33 +12,23 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    networks:
-      - derailedapinet
+    environment:
+      - STORAGE_URI=redis://redis:6379
+      - MONGO_URI=mongodb://mongo:27017
+      - KAFKA_URI=kafka:9092
 
   redis:
     image: eqalpha/keydb
-    ports:
-      - "6379:6379"
-    networks:
-      - derailedapinet
 
   mongo:
     image: mongo
-    ports:
-      - "27017:27017"
     volumes:
       - ./.data/db:/data/db
-    networks:
-      - derailedapinet
 
   zookeeper:
     image: 'bitnami/zookeeper:latest'
     environment:
       - ALLOW_ANONYMOUS_LOGIN=yes
-    ports:
-      - "2181:2181"
-    networks:
-      - derailedapinet
 
   kafka:
     image: 'bitnami/kafka:latest'
@@ -55,7 +41,3 @@ services:
       - KAFKA_ADVERTISED_HOST_NAME=kafka
     depends_on:
       - zookeeper
-    ports:
-      - "9092:9092"
-    networks:
-      - derailedapinet
