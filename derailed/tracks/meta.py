@@ -140,4 +140,14 @@ async def delete_track(
         await messages.delete()
         await pins.delete()
 
+    await produce(
+        'track',
+        Event(
+            'TRACK_DELETE',
+            {'track_id': track.id, 'guild_id': track.guild_id},
+            guild_id=guild.id if track.guild_id else None,
+            user_id=user.id if track.type in (2, 3) else None,
+        ),
+    )
+
     return ''

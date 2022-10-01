@@ -10,11 +10,13 @@ from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from pydantic import BaseModel, Field
 
 from derailed.database import (
+    Event,
     Member,
     Track,
     User,
     get_new_track_position,
     get_track_dict,
+    produce,
 )
 from derailed.depends import get_user
 from derailed.exceptions import NoAuthorizationError
@@ -119,4 +121,8 @@ async def create_track(
     )
     await track.insert()
 
-    return track.dict(exclude={'icon', 'members'})
+    t = track.dict(exclude={'icon', 'members'})
+
+    await produce('track', Event('TRACK_CREATE', t, guild_id=guild_id))
+
+    return t

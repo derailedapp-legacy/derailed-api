@@ -11,12 +11,14 @@ from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response
 from pydantic import BaseModel, Field
 
 from derailed.database import (
+    Event,
     Guild,
     Message,
     Track,
     User,
     get_date,
     get_member_permissions,
+    produce,
 )
 from derailed.depends import get_user
 from derailed.exceptions import NoAuthorizationError
@@ -150,7 +152,11 @@ async def create_message(
     )
     await message.insert()
 
-    return message.dict()
+    m = message.dict()
+
+    await produce('messages', Event('MESSAGE_CREATE', m, guild_id=guild.id))
+
+    return m
 
 
 @router.patch('/tracks/{track_id}/messages/{message_id}')
@@ -166,7 +172,9 @@ async def modify_message(
     if user is None:
         raise NoAuthorizationError()
 
-    if not await Track.find_one(Track.id == track_id).exists():
+    track = await Track.find_one(Track.id == track_id)
+
+    if not track:
         raise HTTPException(404, 'Track not found')
 
     message = await Message.find_one(
@@ -178,7 +186,11 @@ async def modify_message(
 
     await message.update(content=model.content.strip())
 
-    return message
+    m = message.dict()
+
+    await produce('messages', Event('MESSAGE_MODIFY', m, guild_id=track.guild_id))
+
+    return m
 
 
 @router.delete('/tracks/{track_id}/messages/{message_id}')
@@ -204,16 +216,30 @@ async def delete_message(
 
     is_owner = user.id == guild.owner_id
 
-    if (
-        not has_bit(permissions, RolePermissionEnum.DELETE_MESSAGES.value)
-        and not is_owner
-    ):
-        raise HTTPException(403, 'Invalid permissions')
-
     message = await Message.find_one(
         Message.track_id == track_id, Message.id == message_id
     )
 
+    if (
+        not has_bit(permissions, RolePermissionEnum.DELETE_MESSAGES.value)
+        and not is_owner
+        and message.author_id != user.id
+    ):
+        raise HTTPException(403, 'Invalid permissions')
+
     await message.delete()
+
+    await produce(
+        'messages',
+        Event(
+            'MESSAGE_DELETE',
+            {
+                'message_id': message.id,
+                'track_id': message.track_id,
+                'guild_id': guild.id,
+            },
+            guild_id=guild.id,
+        ),
+    )
 
     return ''
