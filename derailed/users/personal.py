@@ -76,9 +76,7 @@ async def find_discriminator(username: str) -> str:
     raise HTTPException(400, 'Unable to find discriminator for this username')
 
 
-FORBIDDEN_USERNAMES = {
-    'derailed'
-}
+FORBIDDEN_USERNAMES = {'derailed'}
 
 
 @router.post('/register', status_code=201)

@@ -26,12 +26,16 @@ async def get_member_roles(user_id: str, guild_id: str) -> list[Role]:
 
 
 @overload
-async def get_member_permissions(user_id: str, guild_id: str) -> int:
+async def get_member_permissions(
+    user_id: str, guild_id: str, get_highest_role_position: bool = False
+) -> int:
     pass
 
 
 @overload
-async def get_member_permissions(user_id: str, guild_id: str) -> tuple[int, int]:
+async def get_member_permissions(
+    user_id: str, guild_id: str, get_highest_role_position: bool = True
+) -> tuple[int, int]:
     pass
 
 
@@ -92,3 +96,19 @@ def get_track_dict(track: Track) -> dict[str, Any]:
                 'parent_id',
             }
         )
+
+
+async def get_highest_position(parent: Track | None = None) -> int:
+    highest_position = 0
+
+    tracks = Track.find_many(Track.parent_id == parent.id)
+
+    async for track in tracks:
+        if track.position > highest_position:
+            highest_position = track.position
+
+    return highest_position
+
+
+async def get_new_channel_position(parent: Track | None = None) -> int:
+    return (await get_highest_position(parent=parent)) + 1

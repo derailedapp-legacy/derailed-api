@@ -7,12 +7,27 @@
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, Request
+from pydantic import BaseModel
 
-from derailed.database import Member, Track, User, get_track_dict
+from derailed.database import (
+    Member,
+    Track,
+    User,
+    get_new_channel_position,
+    get_track_dict,
+)
 from derailed.depends import get_user
 from derailed.exceptions import NoAuthorizationError
+from derailed.identifier import make_snowflake
 
 router = APIRouter()
+
+
+class CreateTrack(BaseModel):
+    name: str
+    topic: str | None
+    parent_id: str
+    type: int
 
 
 @router.get('/guilds/{guild_id}/tracks')
@@ -51,3 +66,45 @@ async def get_guild_track(
     return get_track_dict(
         track=await Track.find_one(Track.guild_id == guild_id, Track.id == track_id)
     )
+
+
+@router.post('/guilds/{guild_id}/tracks')
+async def create_track(
+    guild_id: str,
+    request: Request,
+    model: CreateTrack,
+    user: User | None = Depends(get_user),
+) -> dict[str, Any]:
+    if user is None:
+        raise NoAuthorizationError()
+
+    if not await Member.find_one(
+        Member.user_id == user.id, Member.guild_id == guild_id
+    ).exists():
+        raise HTTPException(403, 'You are not a member of this guild')
+
+    if model.parent_id:
+        parent = await Track.get(model.parent_id)
+
+        if not parent or parent.guild_id != guild_id:
+            raise HTTPException(400, 'Invalid or unaccessible parent channel.')
+    else:
+        parent = None
+
+    position = await get_new_channel_position(parent=parent)
+
+    track = Track(
+        id=make_snowflake(),
+        guild_id=guild_id,
+        name=model.name,
+        topic=model.topic,
+        position=position,
+        type=model.type,
+        nsfw=False,
+        last_message_id=None,
+        parent_id=parent.id if parent else None,
+        overwrites=[],
+    )
+    await track.insert()
+
+    return track.dict(exclude={'icon', 'members'})
