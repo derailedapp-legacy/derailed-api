@@ -5,7 +5,7 @@
 # Sharing of any piece of code to any unauthorized third-party is not allowed.
 from typing import Literal
 
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from pydantic import BaseModel
 
 from derailed.database import Event, Relationship, User, produce
@@ -24,6 +24,7 @@ async def user_is_relatable(
     username: str,
     discriminator: str,
     request: Request,
+    response: Response,
     user: User | None = Depends(get_user),
 ) -> dict:
     if user is None:
@@ -58,6 +59,7 @@ async def create_relationship(
     user_id: str,
     model: CreateRelationship,
     request: Request,
+    response: Response,
     user: User | None = Depends(get_user),
 ) -> str:
     if user is None:
@@ -137,7 +139,7 @@ async def create_relationship(
 
 @router.delete('/relationships/{user_id}', status_code=204)
 async def delete_relationship(
-    user_id: str, request: Request, user: User | None = Depends(get_user)
+    user_id: str, request: Request, response: Response, user: User | None = Depends(get_user)
 ) -> str:
     if user is None:
         raise NoAuthorizationError()

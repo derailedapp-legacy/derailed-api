@@ -5,7 +5,7 @@
 # Sharing of any piece of code to any unauthorized third-party is not allowed.
 from typing import Any
 
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from pydantic import BaseModel, Field
 
 from derailed.database import (
@@ -38,6 +38,7 @@ async def modify_track(
     track_id: str,
     model: ModifyTrack,
     request: Request,
+    response: Response,
     user: User | None = Depends(get_user),
 ) -> dict:
     if user is None:
@@ -89,7 +90,7 @@ async def modify_track(
 @router.delete('/tracks/{track_id}', status_code=204)
 @track_limit()
 async def delete_track(
-    track_id: str, request: Request, user: User | None = Depends(get_user)
+    track_id: str, request: Request, response: Response, user: User | None = Depends(get_user)
 ) -> str:
     if user is None:
         raise NoAuthorizationError()

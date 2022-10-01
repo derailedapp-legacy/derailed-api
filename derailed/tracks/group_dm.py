@@ -3,7 +3,7 @@
 # Copyright 2022 Derailed Inc. All rights reserved.
 #
 # Sharing of any piece of code to any unauthorized third-party is not allowed.
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from pydantic import BaseModel, Field
 
 from derailed.database import Relationship, Track, User, get_track_dict, produce
@@ -25,7 +25,7 @@ class CreateGroupDM(BaseModel):
 @router.post('/users/@me/group-dms', status_code=201)
 @track_limit()
 async def create_group_dm(
-    model: CreateGroupDM, request: Request, user: User | None = Depends(get_user)
+    model: CreateGroupDM, request: Request, response: Response, user: User | None = Depends(get_user)
 ) -> dict:
     if user is None:
         raise NoAuthorizationError()

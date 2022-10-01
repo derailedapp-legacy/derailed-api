@@ -7,7 +7,7 @@
 from typing import Any
 
 import pymongo
-from fastapi import APIRouter, Depends, HTTPException, Query, Request
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response
 from pydantic import BaseModel, Field
 
 from derailed.database import (
@@ -36,6 +36,7 @@ class MessageAction(BaseModel):
 async def get_track_messages(
     track_id: str,
     request: Request,
+    response: Response,
     limit: int = Query(50, gt=0, lt=200),
     user: User | None = Depends(get_user),
 ) -> dict[str, Any]:
@@ -77,6 +78,7 @@ async def get_track_message(
     track_id: str,
     message_id: str,
     request: Request,
+    response: Response,
     user: User | None = Depends(get_user),
 ) -> dict[str, Any]:
     if user is None:
@@ -112,6 +114,7 @@ async def get_track_message(
 async def create_message(
     track_id: str,
     request: Request,
+    response: Response,
     model: MessageAction,
     user: User | None = Depends(get_user),
 ) -> dict[str, Any]:
@@ -156,6 +159,7 @@ async def modify_message(
     track_id: str,
     message_id: str,
     request: Request,
+    response: Response,
     model: MessageAction,
     user: User | None = Depends(get_user),
 ) -> dict[str, Any]:
@@ -183,6 +187,7 @@ async def delete_message(
     track_id: str,
     message_id: str,
     request: Request,
+    response: Response,
     user: User | None = Depends(get_user),
 ) -> str:
     if user is None:

@@ -6,7 +6,7 @@
 
 from typing import Any
 
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from pydantic import BaseModel, Field
 
 from derailed.database import (
@@ -34,7 +34,7 @@ class CreateTrack(BaseModel):
 @router.get('/guilds/{guild_id}/tracks')
 @track_limit()
 async def get_guild_tracks(
-    guild_id: str, request: Request, user: User | None = Depends(get_user)
+    guild_id: str, request: Request, response: Response, user: User | None = Depends(get_user)
 ) -> list[dict[str, Any]]:
     if user is None:
         raise NoAuthorizationError()
@@ -56,6 +56,7 @@ async def get_guild_track(
     guild_id: str,
     track_id: str,
     request: Request,
+    response: Response,
     user: User | None = Depends(get_user),
 ) -> dict[str, Any]:
     if user is None:
@@ -76,6 +77,7 @@ async def get_guild_track(
 async def create_track(
     guild_id: str,
     request: Request,
+    response: Response,
     model: CreateTrack,
     user: User | None = Depends(get_user),
 ) -> dict[str, Any]:

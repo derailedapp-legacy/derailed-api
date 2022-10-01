@@ -5,7 +5,7 @@
 # Sharing of any piece of code to any unauthorized third-party is not allowed.
 from typing import Literal
 
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, Request, Response
 from pydantic import BaseModel
 
 from derailed.database import Event, Presence, Settings, User, produce
@@ -21,7 +21,7 @@ class EditSettings(BaseModel):
 
 
 @router.get('/users/@me/settings')
-async def get_settings(user: User | None = Depends(get_user)) -> dict:
+async def get_settings(request: Request, response: Response, user: User | None = Depends(get_user)) -> dict:
     if user is None:
         raise NoAuthorizationError()
 
@@ -31,7 +31,7 @@ async def get_settings(user: User | None = Depends(get_user)) -> dict:
 
 @router.patch('/users/@me/settings')
 async def patch_settings(
-    model: EditSettings, request: Request, user: User | None = Depends(get_user)
+    model: EditSettings, request: Request, response: Response, user: User | None = Depends(get_user)
 ) -> dict:
     if user is None:
         raise NoAuthorizationError()
