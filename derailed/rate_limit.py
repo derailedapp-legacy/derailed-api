@@ -30,3 +30,5 @@ def get_limiter() -> Limiter:
 
 
 rate_limiter = get_limiter()
+
+track_limit = rate_limiter.shared_limit('20/second', 'track_id')

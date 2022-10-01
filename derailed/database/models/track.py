@@ -12,7 +12,7 @@ from pydantic import BaseModel
 
 
 class Overwrite(BaseModel):
-    channel_id: str
+    track_id: str
     object_id: str
     type: int
     allow: int

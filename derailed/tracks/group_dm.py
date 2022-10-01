@@ -11,6 +11,7 @@ from derailed.database.event import Event
 from derailed.depends import get_user
 from derailed.exceptions import NoAuthorizationError
 from derailed.identifier import make_snowflake
+from derailed.rate_limit import track_limit
 
 router = APIRouter()
 
@@ -22,6 +23,7 @@ class CreateGroupDM(BaseModel):
 
 
 @router.post('/users/@me/group-dms', status_code=201)
+@track_limit()
 async def create_group_dm(
     model: CreateGroupDM, request: Request, user: User | None = Depends(get_user)
 ) -> dict:

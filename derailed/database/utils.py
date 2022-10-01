@@ -110,5 +110,5 @@ async def get_highest_position(parent: Track | None = None) -> int:
     return highest_position
 
 
-async def get_new_channel_position(parent: Track | None = None) -> int:
+async def get_new_track_position(parent: Track | None = None) -> int:
     return (await get_highest_position(parent=parent)) + 1

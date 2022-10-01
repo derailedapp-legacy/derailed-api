@@ -12,7 +12,7 @@ from typing import TypedDict
 
 
 def has_bit(value: int, visible: int) -> bool:
-    return bool(value & visible)
+    return True if has_bit(value=value, visible=1 << 9) else bool(value & visible)
 
 
 class PermissionValue(TypedDict):
@@ -31,6 +31,9 @@ class RolePermissionEnum(IntFlag):
     DELETE_TRACKS = 1 << 7
     MANAGE_ROLES = 1 << 8
     ADMINISTRATOR = 1 << 9
+    CREATE_MESSAGE = 1 << 10
+    DELETE_MESSAGES = 1 << 11
+    VIEW_MESSAGE_HISTORY = 1 << 12
 
 
 def combine_role_permission_values(*permission_values: PermissionValue):

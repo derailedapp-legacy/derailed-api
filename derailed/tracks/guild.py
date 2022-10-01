@@ -7,30 +7,32 @@
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, Request
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from derailed.database import (
     Member,
     Track,
     User,
-    get_new_channel_position,
+    get_new_track_position,
     get_track_dict,
 )
 from derailed.depends import get_user
 from derailed.exceptions import NoAuthorizationError
 from derailed.identifier import make_snowflake
+from derailed.rate_limit import track_limit
 
 router = APIRouter()
 
 
 class CreateTrack(BaseModel):
-    name: str
-    topic: str | None
+    name: str = Field(max_length=55, min_length=1)
+    topic: str | None = Field(max_length=1000, min_length=1)
     parent_id: str
     type: int
 
 
 @router.get('/guilds/{guild_id}/tracks')
+@track_limit()
 async def get_guild_tracks(
     guild_id: str, request: Request, user: User | None = Depends(get_user)
 ) -> list[dict[str, Any]]:
@@ -49,6 +51,7 @@ async def get_guild_tracks(
 
 
 @router.get('/guilds/{guild_id}/tracks/{track_id}')
+@track_limit()
 async def get_guild_track(
     guild_id: str,
     track_id: str,
@@ -69,6 +72,7 @@ async def get_guild_track(
 
 
 @router.post('/guilds/{guild_id}/tracks')
+@track_limit()
 async def create_track(
     guild_id: str,
     request: Request,
@@ -87,11 +91,11 @@ async def create_track(
         parent = await Track.get(model.parent_id)
 
         if not parent or parent.guild_id != guild_id:
-            raise HTTPException(400, 'Invalid or unaccessible parent channel.')
+            raise HTTPException(400, 'Invalid or unaccessible parent channel')
     else:
         parent = None
 
-    position = await get_new_channel_position(parent=parent)
+    position = await get_new_track_position(parent=parent)
 
     track = Track(
         id=make_snowflake(),
