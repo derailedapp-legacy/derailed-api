@@ -23,9 +23,12 @@ class CreateGroupDM(BaseModel):
 
 
 @router.post('/users/@me/group-dms', status_code=201)
-@track_limit()
+@track_limit
 async def create_group_dm(
-    model: CreateGroupDM, request: Request, response: Response, user: User | None = Depends(get_user)
+    model: CreateGroupDM,
+    request: Request,
+    response: Response,
+    user: User | None = Depends(get_user),
 ) -> dict:
     if user is None:
         raise NoAuthorizationError()

@@ -4,7 +4,7 @@
 #
 # Sharing of any piece of code to any unauthorized third-party is not allowed.
 
-from typing import Any
+from typing import Any, Literal
 
 from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from pydantic import BaseModel, Field
@@ -27,14 +27,17 @@ router = APIRouter()
 class CreateTrack(BaseModel):
     name: str = Field(max_length=55, min_length=1)
     topic: str | None = Field(max_length=1000, min_length=1)
-    parent_id: str
-    type: int
+    parent_id: str | None = None
+    type: Literal[0, 1] | None = 1
 
 
 @router.get('/guilds/{guild_id}/tracks')
-@track_limit()
+@track_limit
 async def get_guild_tracks(
-    guild_id: str, request: Request, response: Response, user: User | None = Depends(get_user)
+    guild_id: str,
+    request: Request,
+    response: Response,
+    user: User | None = Depends(get_user),
 ) -> list[dict[str, Any]]:
     if user is None:
         raise NoAuthorizationError()
@@ -51,7 +54,7 @@ async def get_guild_tracks(
 
 
 @router.get('/guilds/{guild_id}/tracks/{track_id}')
-@track_limit()
+@track_limit
 async def get_guild_track(
     guild_id: str,
     track_id: str,
@@ -73,7 +76,7 @@ async def get_guild_track(
 
 
 @router.post('/guilds/{guild_id}/tracks')
-@track_limit()
+@track_limit
 async def create_track(
     guild_id: str,
     request: Request,
@@ -89,15 +92,18 @@ async def create_track(
     ).exists():
         raise HTTPException(403, 'You are not a member of this guild')
 
+    if model.parent_id and model.type == 0:
+        raise HTTPException(400, 'Category tracks cannot have parents')
+
     if model.parent_id:
         parent = await Track.get(model.parent_id)
 
         if not parent or parent.guild_id != guild_id:
-            raise HTTPException(400, 'Invalid or unaccessible parent channel')
+            raise HTTPException(400, 'Invalid or unaccessible parent track')
     else:
         parent = None
 
-    position = await get_new_track_position(parent=parent)
+    position = await get_new_track_position(parent=parent, guild_id=guild_id)
 
     track = Track(
         id=make_snowflake(),

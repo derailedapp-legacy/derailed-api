@@ -40,7 +40,10 @@ class ModifyRole(BaseModel):
 
 @router.get('/guilds/{guild_id}/roles', status_code=200)
 async def get_guild_roles(
-    guild_id: str, request: Request, response: Response, user: User | None = Depends(get_user)
+    guild_id: str,
+    request: Request,
+    response: Response,
+    user: User | None = Depends(get_user),
 ) -> list[Role]:
     if user is None:
         raise NoAuthorizationError()
@@ -59,7 +62,11 @@ async def get_guild_roles(
 
 @router.get('/guilds/{guild_id}/roles/{role_id}', status_code=200)
 async def get_guild_role(
-    guild_id: str, role_id: str, request: Request, response: Response, user: User | None = Depends(get_user)
+    guild_id: str,
+    role_id: str,
+    request: Request,
+    response: Response,
+    user: User | None = Depends(get_user),
 ) -> list[Role]:
     if user is None:
         raise NoAuthorizationError()
@@ -212,7 +219,11 @@ async def modify_role(
 
 @router.delete('/guilds/{guild_id}/roles/{role_id}', status_code=204)
 async def delete_guild_role(
-    guild_id: str, role_id: str, request: Request, response: Response, user: User | None = Depends(get_user)
+    guild_id: str,
+    role_id: str,
+    request: Request,
+    response: Response,
+    user: User | None = Depends(get_user),
 ) -> str:
     if user is None:
         raise NoAuthorizationError()

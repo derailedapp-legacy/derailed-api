@@ -98,17 +98,25 @@ def get_track_dict(track: Track) -> dict[str, Any]:
         )
 
 
-async def get_highest_position(parent: Track | None = None) -> int:
+async def get_highest_position(guild_id: str, parent: Track | None = None) -> int:
     highest_position = 0
 
-    tracks = Track.find_many(Track.parent_id == parent.id)
-
-    async for track in tracks:
-        if track.position > highest_position:
-            highest_position = track.position
+    if parent:
+        async for track in Track.find(
+            Track.guild_id == guild_id,
+            Track.parent_id == parent.id,
+        ):
+            if track.position > highest_position:
+                highest_position = track.position
+    else:
+        async for track in Track.find(
+            Track.guild_id == guild_id,
+        ):
+            if track.position > highest_position and track.parent_id is None:
+                highest_position = track.position
 
     return highest_position
 
 
-async def get_new_track_position(parent: Track | None = None) -> int:
-    return (await get_highest_position(parent=parent)) + 1
+async def get_new_track_position(guild_id: str, parent: Track | None = None) -> int:
+    return (await get_highest_position(parent=parent, guild_id=guild_id)) + 1

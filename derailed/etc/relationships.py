@@ -139,7 +139,10 @@ async def create_relationship(
 
 @router.delete('/relationships/{user_id}', status_code=204)
 async def delete_relationship(
-    user_id: str, request: Request, response: Response, user: User | None = Depends(get_user)
+    user_id: str,
+    request: Request,
+    response: Response,
+    user: User | None = Depends(get_user),
 ) -> str:
     if user is None:
         raise NoAuthorizationError()

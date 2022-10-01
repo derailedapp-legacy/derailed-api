@@ -43,6 +43,7 @@ class Message(Document):
     mention_everyone: bool
     pinned: bool = False
     type: int
+    content: str
 
 
 class Pin(Document):

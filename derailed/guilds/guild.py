@@ -36,7 +36,10 @@ class ModifyGuild(CreateGuild):
 
 @router.post('', status_code=201)
 async def create_guild(
-    model: CreateGuild, request: Request, response: Response, user: User | None = Depends(get_user)
+    model: CreateGuild,
+    request: Request,
+    response: Response,
+    user: User | None = Depends(get_user),
 ) -> dict:
     if user is None:
         raise NoAuthorizationError()
@@ -75,7 +78,10 @@ async def create_guild(
 
 @router.get('/{guild_id}', status_code=200)
 async def get_guild(
-    guild_id: str, request: Request, response: Response, user: User | None = Depends(get_user)
+    guild_id: str,
+    request: Request,
+    response: Response,
+    user: User | None = Depends(get_user),
 ) -> dict:
     if user is None:
         raise NoAuthorizationError()
@@ -93,7 +99,10 @@ async def get_guild(
 
 @router.get('/{guild_id}/preview', status_code=200)
 async def get_guild_preview(
-    guild_id: str, request: Request, response: Response, user: User | None = Depends(get_user)
+    guild_id: str,
+    request: Request,
+    response: Response,
+    user: User | None = Depends(get_user),
 ) -> dict:
     if user is None:
         raise NoAuthorizationError()
@@ -149,7 +158,10 @@ async def modify_guild(
 
 @router.delete('/{guild_id}', status_code=204)
 async def delete_guild(
-    guild_id: str, request: Request, response: Response, user: User | None = Depends(get_user)
+    guild_id: str,
+    request: Request,
+    response: Response,
+    user: User | None = Depends(get_user),
 ) -> str:
     if user is None:
         raise NoAuthorizationError()

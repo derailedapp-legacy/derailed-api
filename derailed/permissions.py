@@ -12,7 +12,7 @@ from typing import TypedDict
 
 
 def has_bit(value: int, visible: int) -> bool:
-    return True if has_bit(value=value, visible=1 << 9) else bool(value & visible)
+    return True if value & 1 << 9 else bool(value & visible)
 
 
 class PermissionValue(TypedDict):

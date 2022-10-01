@@ -33,7 +33,7 @@ class ModifyTrack(BaseModel):
 
 
 @router.patch('/tracks/{track_id}')
-@track_limit()
+@track_limit
 async def modify_track(
     track_id: str,
     model: ModifyTrack,
@@ -88,9 +88,12 @@ async def modify_track(
 
 
 @router.delete('/tracks/{track_id}', status_code=204)
-@track_limit()
+@track_limit
 async def delete_track(
-    track_id: str, request: Request, response: Response, user: User | None = Depends(get_user)
+    track_id: str,
+    request: Request,
+    response: Response,
+    user: User | None = Depends(get_user),
 ) -> str:
     if user is None:
         raise NoAuthorizationError()

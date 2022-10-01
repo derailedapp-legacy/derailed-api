@@ -21,7 +21,9 @@ class EditSettings(BaseModel):
 
 
 @router.get('/users/@me/settings')
-async def get_settings(request: Request, response: Response, user: User | None = Depends(get_user)) -> dict:
+async def get_settings(
+    request: Request, response: Response, user: User | None = Depends(get_user)
+) -> dict:
     if user is None:
         raise NoAuthorizationError()
 
@@ -31,7 +33,10 @@ async def get_settings(request: Request, response: Response, user: User | None =
 
 @router.patch('/users/@me/settings')
 async def patch_settings(
-    model: EditSettings, request: Request, response: Response, user: User | None = Depends(get_user)
+    model: EditSettings,
+    request: Request,
+    response: Response,
+    user: User | None = Depends(get_user),
 ) -> dict:
     if user is None:
         raise NoAuthorizationError()

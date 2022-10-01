@@ -22,7 +22,7 @@ from fastapi import FastAPI, Request, Response
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 
-from derailed import database, etc, exceptions, guilds, users
+from derailed import database, etc, exceptions, guilds, tracks, users
 from derailed.rate_limit import rate_limiter
 
 load_dotenv()
@@ -85,6 +85,10 @@ async def on_startup():
     app.include_router(guilds.guild.router)
     app.include_router(guilds.role.router)
     app.include_router(etc.relationships.router)
+    app.include_router(tracks.gdm)
+    app.include_router(tracks.gtr)
+    app.include_router(tracks.mta)
+    app.include_router(tracks.msg)
 
     # Load extra routers, plugins, or other modules.
     await load_features()

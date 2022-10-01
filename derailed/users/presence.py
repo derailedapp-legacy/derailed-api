@@ -19,7 +19,10 @@ class PutPresence(BaseModel):
 
 @router.put('/users/@me/presence', status_code=204)
 async def put_presence(
-    model: PutPresence, request: Request, response: Response, user: User | None = Depends(get_user)
+    model: PutPresence,
+    request: Request,
+    response: Response,
+    user: User | None = Depends(get_user),
 ) -> str:
     if user is None:
         raise NoAuthorizationError()

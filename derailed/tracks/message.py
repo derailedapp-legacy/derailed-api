@@ -32,7 +32,7 @@ class MessageAction(BaseModel):
 
 
 @router.get('/tracks/{track_id}/messages')
-@track_limit()
+@track_limit
 async def get_track_messages(
     track_id: str,
     request: Request,
@@ -73,7 +73,7 @@ async def get_track_messages(
 
 
 @router.get('/tracks/{track_id}/messages/{message_id}')
-@track_limit()
+@track_limit
 async def get_track_message(
     track_id: str,
     message_id: str,
@@ -110,7 +110,7 @@ async def get_track_message(
 
 
 @router.post('/tracks/{track_id}/messages')
-@track_limit()
+@track_limit
 async def create_message(
     track_id: str,
     request: Request,
@@ -154,7 +154,7 @@ async def create_message(
 
 
 @router.patch('/tracks/{track_id}/messages/{message_id}')
-@track_limit()
+@track_limit
 async def modify_message(
     track_id: str,
     message_id: str,
@@ -182,7 +182,7 @@ async def modify_message(
 
 
 @router.delete('/tracks/{track_id}/messages/{message_id}')
-@track_limit()
+@track_limit
 async def delete_message(
     track_id: str,
     message_id: str,
