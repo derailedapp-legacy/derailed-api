@@ -129,3 +129,5 @@ async def get_invite_code() -> str:
 
     if await Invite.find_one(Invite.id == code).exists():
         return await asyncio.create_task(get_invite_code())
+
+    return code
