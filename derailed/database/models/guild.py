@@ -35,3 +35,11 @@ class Role(Document):
     hoist: bool = False
     permissions: int
     position: int
+
+
+class Invite(Document):
+    id: str
+    guild_id: str
+    track_id: str
+    inviter_id: str
+    expires_at: int | None

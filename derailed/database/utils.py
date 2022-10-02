@@ -4,9 +4,11 @@
 #
 # Sharing of any piece of code to any unauthorized third-party is not allowed.
 
+import asyncio
 from typing import TYPE_CHECKING, Any, overload
 
-from derailed.database import Member, Role, Track
+from derailed.database import Invite, Member, Role, Track
+from derailed.identifier import make_invite
 from derailed.permissions import PermissionValue, combine_role_permission_values
 
 
@@ -120,3 +122,10 @@ async def get_highest_position(guild_id: str, parent: Track | None = None) -> in
 
 async def get_new_track_position(guild_id: str, parent: Track | None = None) -> int:
     return (await get_highest_position(parent=parent, guild_id=guild_id)) + 1
+
+
+async def get_invite_code() -> str:
+    code = make_invite()
+
+    if await Invite.find_one(Invite.id == code).exists():
+        return await asyncio.create_task(get_invite_code())

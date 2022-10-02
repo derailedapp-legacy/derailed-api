@@ -9,8 +9,12 @@ from pydantic import BaseModel, Field
 from derailed.database import (
     Event,
     Guild,
+    Invite,
     Member,
+    Message,
+    Pin,
     Role,
+    Track,
     User,
     get_date,
     get_member_permissions,
@@ -43,6 +47,11 @@ async def create_guild(
 ) -> dict:
     if user is None:
         raise NoAuthorizationError()
+
+    guild_count = await Member.find(Member.user_id == user.id).count()
+
+    if guild_count == 200:
+        raise HTTPException(403, 'Max joined guilds reached')
 
     guild = Guild(
         id=make_snowflake(),
@@ -176,7 +185,7 @@ async def delete_guild(
 
     member_count = await Member.find(Member.guild_id == guild.id).count()
 
-    if member_count > 1000:
+    if member_count > 500:
         raise HTTPException(400, 'This guild has more then 1000 members')
 
     members = Member.find(Member.guild_id == guild_id)
@@ -193,6 +202,16 @@ async def delete_guild(
                 guild_id=guild.id,
             ),
         )
+
+    tracks = Track.find(Track.guild_id == guild.id)
+
+    async for track in tracks:
+        await track.delete()
+        await Message.find(Message.track_id == track.id).delete()
+        await Pin.find(Pin.origin == track.id).delete()
+
+    await Role.find(Role.guild_id == guild.id).delete()
+    await Invite.find(Invite.guild_id == guild.id).delete()
 
     await guild.delete()
 

@@ -4,8 +4,10 @@
 #
 # Sharing of any piece of code to any unauthorized third-party is not allowed.
 import os
+import secrets
 import threading
 import time
+from random import randint
 
 INCREMENTATION: int = 0
 EPOCH: int = 1641042000000
@@ -32,6 +34,10 @@ def make_snowflake() -> str:
     INCREMENTATION += 1
 
     return str(epoch)
+
+
+def make_invite() -> str:
+    return secrets.token_urlsafe(randint(4, 7))
 
 
 if __name__ == '__main__':

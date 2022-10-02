@@ -34,6 +34,8 @@ class RolePermissionEnum(IntFlag):
     CREATE_MESSAGE = 1 << 10
     DELETE_MESSAGES = 1 << 11
     VIEW_MESSAGE_HISTORY = 1 << 12
+    CREATE_INVITES = 1 << 13
+    DELETE_INVITES = 1 << 14
 
 
 def combine_role_permission_values(*permission_values: PermissionValue):
