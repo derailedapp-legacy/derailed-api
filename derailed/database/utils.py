@@ -112,7 +112,7 @@ async def get_highest_position(guild_id: str, parent: Track | None = None) -> in
         async for track in Track.find(
             Track.guild_id == guild_id,
         ):
-            if track.position > highest_position and track.parent_id is None:
+            if int(track.position) > int(highest_position) and track.parent_id is None:
                 highest_position = track.position
 
     return highest_position
