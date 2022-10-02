@@ -110,10 +110,7 @@ async def create_track(
 
     permissions = await get_member_permissions(user_id=user.id, guild_id=guild_id)
 
-    if (
-        not has_bit(permissions, RolePermissionEnum.CREATE_TRACK.value)
-        and not is_owner
-    ):
+    if not has_bit(permissions, RolePermissionEnum.CREATE_TRACK.value) and not is_owner:
         raise HTTPException(403, 'Invalid permissions')
 
     if model.parent_id and model.type == 0:
@@ -181,7 +178,9 @@ async def create_invite(
 
     current_second = int(time())
 
-    if (current_second + 10000) > model.expires_at or len(str(model.expires_at)) > 11:
+    if model.expires_at is not None and (
+        (current_second + 10000) > model.expires_at or len(str(model.expires_at)) > 11
+    ):
         raise HTTPException(400, 'Expiry date is invalid')
 
     invite = Invite(
