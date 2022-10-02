@@ -90,6 +90,9 @@ async def register(model: Register, request: Request, response: Response) -> dic
     if usage == 9000:
         raise HTTPException(400, 'Too many people have used this username')
 
+    if await User.find(User.email == model.email).exists():
+        raise HTTPException(400, 'Email already used')
+
     user_id = make_snowflake()
 
     user = User(
