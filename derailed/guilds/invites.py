@@ -79,6 +79,9 @@ async def accept_invite(
         await invite.delete()
         raise HTTPException(400, 'This invite has expired')
 
+    if await Member.find_one(Member.user_id == user.id, Member.guild_id == invite.guild_id).exists():
+        raise HTTPException(400, 'You\'re already a member of this guild')
+
     member_count = Member.find(Member.guild_id == invite.guild_id).count()
 
     if member_count == 1000:
