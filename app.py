@@ -89,6 +89,7 @@ async def on_startup():
     app.include_router(tracks.gtr)
     app.include_router(tracks.mta)
     app.include_router(tracks.msg)
+    app.include_router(guilds.invs)
 
     # Load extra routers, plugins, or other modules.
     await load_features()
