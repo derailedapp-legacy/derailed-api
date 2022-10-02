@@ -73,7 +73,7 @@ async def accept_invite(
     if invite is None:
         raise HTTPException(404, 'Invite not found')
 
-    if invite.expires_at < int(time()):
+    if invite.expires_at and invite.expires_at < int(time()):
         # NOTE: This is a really convoluted way of deleting invites
         # any better way?
         await invite.delete()
