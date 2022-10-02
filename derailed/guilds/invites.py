@@ -95,7 +95,7 @@ async def accept_invite(
         role_ids=[invite.guild_id],
     )
     await member.insert()
-    await produce('guild', Event('GUILD_JOIN', data=member, guild_id=invite.guild_id))
+    await produce('guild', Event('GUILD_JOIN', data=member.dict(), guild_id=invite.guild_id))
 
     return ''
 
