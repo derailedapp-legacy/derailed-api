@@ -12,6 +12,7 @@ from pydantic import BaseModel, Field
 
 from derailed.database import (
     Event,
+    Guild,
     Invite,
     Member,
     Track,
@@ -154,9 +155,16 @@ async def create_invite(
     ).exists():
         raise HTTPException(404, 'Track or Guild not found')
 
+    guild = await Guild.find_one(Guild.id == guild_id)
+
+    is_owner = user.id == guild.owner_id
+
     permissions = await get_member_permissions(user_id=user.id, guild_id=guild_id)
 
-    if not has_bit(permissions, RolePermissionEnum.CREATE_INVITES.value):
+    if (
+        not has_bit(permissions, RolePermissionEnum.CREATE_INVITES.value)
+        and not is_owner
+    ):
         raise HTTPException(403, 'Invalid permissions')
 
     current_second = int(time())

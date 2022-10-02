@@ -105,9 +105,13 @@ async def create_role(
         raise HTTPException(403, 'You are not a member of this guild')
 
     # TODO: don't let users set the roles permission higher than their own
+    guild = await Guild.find_one(Guild.id == guild_id)
+
+    is_owner = user.id == guild.owner_id
+
     permissions = await get_member_permissions(user_id=user.id, guild_id=guild_id)
 
-    if not has_bit(permissions, RolePermissionEnum.MANAGE_ROLES.value):
+    if not has_bit(permissions, RolePermissionEnum.MANAGE_ROLES.value) and not is_owner:
         raise HTTPException(403, 'Invalid permissions')
 
     if await Role.find_one(

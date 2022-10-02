@@ -118,11 +118,18 @@ async def delete_invite(
         await invite.delete()
         raise HTTPException(400, 'This invite has expired')
 
+    guild = await Guild.find_one(Guild.id == invite.guild_id)
+
+    is_owner = user.id == guild.owner_id
+
     permissions = await get_member_permissions(
         user_id=user.id, guild_id=invite.guild_id
     )
 
-    if not has_bit(permissions, RolePermissionEnum.DELETE_INVITES.value):
+    if (
+        not has_bit(permissions, RolePermissionEnum.DELETE_INVITES.value)
+        and not is_owner
+    ):
         raise HTTPException(403, 'Invalid permissions')
 
     await invite.delete()
