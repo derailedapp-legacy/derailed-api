@@ -14,6 +14,7 @@ from msgspec import msgpack
 from .event import Event
 from .models import (
     Guild,
+    Invite,
     Member,
     Message,
     Pin,
@@ -38,6 +39,7 @@ DOCUMENT_MODELS = [
     Track,
     Message,
     Pin,
+    Invite,
 ]
 
 
