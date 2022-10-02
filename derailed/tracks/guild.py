@@ -104,6 +104,18 @@ async def create_track(
     ).exists():
         raise HTTPException(403, 'You are not a member of this guild')
 
+    guild = await Guild.find_one(Guild.id == guild_id)
+
+    is_owner = user.id == guild.owner_id
+
+    permissions = await get_member_permissions(user_id=user.id, guild_id=guild_id)
+
+    if (
+        not has_bit(permissions, RolePermissionEnum.CREATE_TRACK.value)
+        and not is_owner
+    ):
+        raise HTTPException(403, 'Invalid permissions')
+
     if model.parent_id and model.type == 0:
         raise HTTPException(400, 'Category tracks cannot have parents')
 
