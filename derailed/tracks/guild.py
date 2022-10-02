@@ -184,7 +184,7 @@ async def create_invite(
         raise HTTPException(400, 'Expiry date is invalid')
 
     invite = Invite(
-        id=get_invite_code(),
+        id=await get_invite_code(),
         guild_id=guild_id,
         track_id=track_id,
         inviter_id=user.id,
