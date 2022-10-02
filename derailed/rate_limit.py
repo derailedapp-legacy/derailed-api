@@ -13,7 +13,9 @@ from derailed.database import User
 from derailed.depends import get_user
 
 
-def get_rate_limit_key(request: Request, user: User | None = Depends(get_user)) -> str:
+async def get_rate_limit_key(
+    request: Request, user: User | None = Depends(get_user)
+) -> str:
     return get_ipaddr(request=request) if user is None else user.id
 
 
