@@ -17,6 +17,7 @@ from derailed.database import (
     get_member_permissions,
     get_track_dict,
     produce,
+    track_has_bit,
 )
 from derailed.database.event import Event
 from derailed.depends import get_user
@@ -59,7 +60,7 @@ async def modify_track(
         is_owner = user.id == guild.owner_id
 
         if (
-            not has_bit(permissions, RolePermissionEnum.MODIFY_TRACK.value)
+            not track_has_bit(permissions, RolePermissionEnum.MODIFY_TRACK.value)
             and not is_owner
         ):
             raise HTTPException(403, 'Invalid permissions')

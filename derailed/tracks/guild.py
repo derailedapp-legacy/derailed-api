@@ -22,6 +22,7 @@ from derailed.database import (
     get_new_track_position,
     get_track_dict,
     produce,
+    track_has_bit,
 )
 from derailed.depends import get_user
 from derailed.exceptions import NoAuthorizationError
@@ -171,7 +172,7 @@ async def create_invite(
     permissions = await get_member_permissions(user_id=user.id, guild_id=guild_id)
 
     if (
-        not has_bit(permissions, RolePermissionEnum.CREATE_INVITES.value)
+        not track_has_bit(permissions, RolePermissionEnum.CREATE_INVITES.value)
         and not is_owner
     ):
         raise HTTPException(403, 'Invalid permissions')

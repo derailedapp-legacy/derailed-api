@@ -9,7 +9,7 @@ from typing import TYPE_CHECKING, Any
 
 from derailed.database import Invite, Member, Role, Track
 from derailed.identifier import make_invite
-from derailed.permissions import PermissionValue, combine_role_permission_values
+from derailed.permissions import PermissionValue, combine_role_permission_values, has_bit
 
 
 async def get_member_roles(user_id: str, guild_id: str) -> list[Role]:
@@ -117,3 +117,14 @@ async def get_invite_code() -> str:
         return await asyncio.create_task(get_invite_code())
 
     return code
+
+
+def track_has_bit(value: int, visible: int, track: Track, member: Member) -> bool:
+    for overwrite in track.overwrites:
+        if overwrite.object_id == member.user_id or overwrite.object_id in member.role_ids:
+            if has_bit(overwrite.allow, visible):
+                return True
+            elif has_bit(overwrite.deny, visible):
+                return False
+
+    return has_bit(value, visible)

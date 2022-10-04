@@ -20,10 +20,11 @@ from derailed.database import (
     get_member_permissions,
     produce,
 )
+from derailed.database.utils import track_has_bit
 from derailed.depends import get_user
 from derailed.exceptions import NoAuthorizationError
 from derailed.identifier import make_snowflake
-from derailed.permissions import RolePermissionEnum, has_bit
+from derailed.permissions import RolePermissionEnum
 from derailed.rate_limit import track_limit
 
 router = APIRouter()
@@ -57,7 +58,7 @@ async def get_track_messages(
     is_owner = user.id == guild.owner_id
 
     if (
-        not has_bit(permissions, RolePermissionEnum.VIEW_MESSAGE_HISTORY.value)
+        not track_has_bit(permissions, RolePermissionEnum.VIEW_MESSAGE_HISTORY.value)
         and not is_owner
     ):
         raise HTTPException(403, 'Invalid permissions')
@@ -98,7 +99,7 @@ async def get_track_message(
     is_owner = user.id == guild.owner_id
 
     if (
-        not has_bit(permissions, RolePermissionEnum.VIEW_MESSAGE_HISTORY.value)
+        not track_has_bit(permissions, RolePermissionEnum.VIEW_MESSAGE_HISTORY.value)
         and not is_owner
     ):
         raise HTTPException(403, 'Invalid permissions')
@@ -128,17 +129,18 @@ async def create_message(
     if not track:
         raise HTTPException(404, 'Track not found')
 
-    permissions = await get_member_permissions(user_id=user.id, guild_id=track.guild_id)
+    if track.guild_id:
+        permissions = await get_member_permissions(user_id=user.id, guild_id=track.guild_id)
 
-    guild = await Guild.find_one(Guild.id == track.guild_id)
+        guild = await Guild.find_one(Guild.id == track.guild_id)
 
-    is_owner = user.id == guild.owner_id
+        is_owner = user.id == guild.owner_id
 
-    if (
-        not has_bit(permissions, RolePermissionEnum.CREATE_MESSAGE.value)
-        and not is_owner
-    ):
-        raise HTTPException(403, 'Invalid permissions')
+        if (
+            not track_has_bit(permissions, RolePermissionEnum.CREATE_MESSAGE.value)
+            and not is_owner
+        ):
+            raise HTTPException(403, 'Invalid permissions')
 
     message = Message(
         id=make_snowflake(),
@@ -210,18 +212,19 @@ async def delete_message(
     if not track:
         raise HTTPException(404, 'Track not found')
 
-    permissions = await get_member_permissions(user_id=user.id, guild_id=track.guild_id)
+    if track.guild_id:
+        permissions = await get_member_permissions(user_id=user.id, guild_id=track.guild_id)
 
-    guild = await Guild.find_one(Guild.id == track.guild_id)
+        guild = await Guild.find_one(Guild.id == track.guild_id)
 
-    is_owner = user.id == guild.owner_id
+        is_owner = user.id == guild.owner_id
 
     message = await Message.find_one(
         Message.track_id == track_id, Message.id == message_id
     )
 
     if (
-        not has_bit(permissions, RolePermissionEnum.DELETE_MESSAGES.value)
+        not track_has_bit(permissions, RolePermissionEnum.DELETE_MESSAGES.value)
         and not is_owner
         and message.author_id != user.id
     ):
