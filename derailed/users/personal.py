@@ -91,7 +91,7 @@ async def register(model: Register, request: Request, response: Response) -> dic
         raise HTTPException(400, 'Too many people have used this username')
 
     if await User.find(User.email == model.email).exists():
-        raise HTTPException(400, 'Email already used')
+        raise HTTPException(400, 'An account with this email already exists')
 
     user_id = make_snowflake()
 
@@ -140,6 +140,21 @@ async def get_current_user(
     return user.dict(exclude={'password'})
 
 
+@router.get('/users/{user_id}', status_code=200)
+async def get_user(
+    user_id: str, request: Request, response: Response, user: User | None = Depends(get_user)
+) -> dict:
+    if user is None:
+        raise NoAuthorizationError()
+
+    other_user = await User.find_one(User.id == user_id)
+
+    if other_user is None:
+        raise HTTPException(404, 'User not found')
+
+    return other_user.dict(exclude={'password', 'verification', 'email'})
+
+
 @router.patch('/users/@me', status_code=200)
 async def patch_current_user(
     model: PatchUser,
@@ -151,6 +166,9 @@ async def patch_current_user(
         raise NoAuthorizationError()
 
     if model.email:
+        if await User.find_one(User.email == model.email).exists():
+            raise HTTPException(400, 'An account with this email already exists')
+
         user.email = model.email
 
     if model.username:
