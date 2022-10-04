@@ -118,23 +118,27 @@ async def modify_track(
             if overwrite.object_id in overwrite_object_ids:
                 raise HTTPException(400, 'This overwrite already exists')
 
-            if overwrite.type == 0:
-                if not await Member.find_one(
+            if (
+                overwrite.type == 0
+                and not await Member.find_one(
                     Member.user_id == overwrite.object_id,
                     Member.guild_id == track.guild_id,
-                ).exists():
-                    raise HTTPException(
-                        400,
-                        f'Overwrite for {overwrite.object_id} failed due to the member not being found',
-                    )
-            elif overwrite.type == 1:
-                if not await Role.find_one(
+                ).exists()
+            ):
+                raise HTTPException(
+                    400,
+                    f'Overwrite for {overwrite.object_id} failed due to the member not being found',
+                )
+            elif (
+                overwrite.type == 1
+                and not await Role.find_one(
                     Role.id == overwrite.object_id, Role.guild_id == track.guild_id
-                ).exists():
-                    raise HTTPException(
-                        400,
-                        f'Overwrite for {overwrite.object_id} failed due to the role not being found',
-                    )
+                ).exists()
+            ):
+                raise HTTPException(
+                    400,
+                    f'Overwrite for {overwrite.object_id} failed due to the role not being found',
+                )
 
             updates['overwrites'].append(
                 Overwrite(
