@@ -12,9 +12,8 @@ from pydantic import BaseModel
 
 
 class Overwrite(BaseModel):
-    track_id: str
     object_id: str
-    type: int
+    type: Literal[0, 1]
     allow: int
     deny: int
 

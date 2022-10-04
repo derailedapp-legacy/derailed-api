@@ -3,15 +3,19 @@
 # Copyright 2022 Derailed Inc. All rights reserved.
 #
 # Sharing of any piece of code to any unauthorized third-party is not allowed.
-from typing import Any
+import itertools
+from typing import Any, Literal
 
 from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from pydantic import BaseModel, Field
 
 from derailed.database import (
     Guild,
+    Member,
     Message,
+    Overwrite,
     Pin,
+    Role,
     Track,
     User,
     get_member_permissions,
@@ -28,9 +32,18 @@ from derailed.rate_limit import track_limit
 router = APIRouter()
 
 
+class AddOverwrite(BaseModel):
+    object_id: str
+    type: Literal[0, 1]
+    allow: int
+    deny: int
+
+
 class ModifyTrack(BaseModel):
     name: str | None | bool = Field(default=False)
     topic: str | None = Field(None, max_length=1000, min_length=1)
+    add_overwrites: list[AddOverwrite] | None = Field(None)
+    remove_overwrites: list[str] | None = Field(None)
 
 
 @router.patch('/tracks/{track_id}')
@@ -75,7 +88,64 @@ async def modify_track(
     if model.topic:
         updates['topic'] = model.topic
 
-    await track.update(**updates)
+    if model.add_overwrites or model.remove_overwrites:
+        updates['overwrites'] = track.overwrites
+
+    # remove comes first to make overwriting incredibly more simple
+    if model.remove_overwrites:
+        if not track.guild_id:
+            raise HTTPException(
+                400, 'You cannot remove or add overwrites on a non-guild track'
+            )
+
+        for overwrite_id, overwrite in itertools.product(
+            model.remove_overwrites, track.overwrites
+        ):
+            if overwrite.object_id == overwrite_id:
+                updates['overwrites'].remove(overwrite)
+
+    if model.add_overwrites:
+        if not track.guild_id:
+            raise HTTPException(
+                400, 'You cannot remove or add overwrites on a non-guild track'
+            )
+
+        overwrite_object_ids = [
+            (overwrite.object_id, overwrite) for overwrite in track.overwrites
+        ]
+
+        for overwrite in model.add_overwrites:
+            if overwrite.object_id in overwrite_object_ids:
+                raise HTTPException(400, 'This overwrite already exists')
+
+            if overwrite.type == 0:
+                if not await Member.find_one(
+                    Member.user_id == overwrite.object_id,
+                    Member.guild_id == track.guild_id,
+                ).exists():
+                    raise HTTPException(
+                        400,
+                        f'Overwrite for {overwrite.object_id} failed due to the member not being found',
+                    )
+            elif overwrite.type == 1:
+                if not await Role.find_one(
+                    Role.id == overwrite.object_id, Role.guild_id == track.guild_id
+                ).exists():
+                    raise HTTPException(
+                        400,
+                        f'Overwrite for {overwrite.object_id} failed due to the role not being found',
+                    )
+
+            updates['overwrites'].append(
+                Overwrite(
+                    object_id=overwrite.object_id,
+                    type=overwrite.type,
+                    allow=overwrite.allow,
+                    deny=overwrite.deny,
+                )
+            )
+
+    await track.update(updates)
 
     track_data = get_track_dict(track=track)
 
