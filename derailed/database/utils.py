@@ -5,7 +5,7 @@
 # Sharing of any piece of code to any unauthorized third-party is not allowed.
 
 import asyncio
-from typing import TYPE_CHECKING, Any, overload
+from typing import TYPE_CHECKING, Any
 
 from derailed.database import Invite, Member, Role, Track
 from derailed.identifier import make_invite
@@ -25,20 +25,6 @@ async def get_member_roles(user_id: str, guild_id: str) -> list[Role]:
         roles.append(await Role.find_one(Role.id == role_id))
 
     return roles
-
-
-@overload
-async def get_member_permissions(
-    user_id: str, guild_id: str, get_highest_role_position: bool = False
-) -> int:
-    pass
-
-
-@overload
-async def get_member_permissions(
-    user_id: str, guild_id: str, get_highest_role_position: bool = True
-) -> tuple[int, int]:
-    pass
 
 
 async def get_member_permissions(

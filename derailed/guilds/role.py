@@ -3,6 +3,7 @@
 # Copyright 2022 Derailed Inc. All rights reserved.
 #
 # Sharing of any piece of code to any unauthorized third-party is not allowed.
+import itertools
 from typing import TYPE_CHECKING, Any
 
 from fastapi import APIRouter, Depends, HTTPException, Request, Response
@@ -36,6 +37,7 @@ class ModifyRole(BaseModel):
     name: str | None = Field(None, max_length=128)
     hoist: bool | None = Field(None)
     position: int | None = Field(None)
+    permissions: int | None = Field(None)
 
 
 @router.get('/guilds/{guild_id}/roles', status_code=200)
@@ -113,6 +115,11 @@ async def create_role(
 
     if not has_bit(permissions, RolePermissionEnum.MANAGE_ROLES.value) and not is_owner:
         raise HTTPException(403, 'Invalid permissions')
+
+    if model.permissions is not None:
+        for value in RolePermissionEnum:
+            if has_bit(model.permissions, value) and not has_bit(permissions, value):
+                raise HTTPException(400, 'You cannot assign roles a permission you don\'t have')
 
     if await Role.find_one(
         Role.guild_id == guild_id, Role.position == model.position
@@ -212,6 +219,11 @@ async def modify_role(
             raise HTTPException(400, 'Role position is over your own role permission.')
 
         await get_position(guild_id=guild_id, role=role, position=model.position)
+
+    if model.permissions is not None:
+        for value in RolePermissionEnum:
+            if has_bit(model.permissions, value) and not has_bit(permissions, value):
+                raise HTTPException(400, 'You cannot assign roles a permission you don\'t have')
 
     await role.update(**updates)
 

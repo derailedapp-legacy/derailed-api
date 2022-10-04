@@ -61,7 +61,7 @@ async def create_guild(
         nsfw=model.nsfw,
     )
     role = Role(
-        id=guild.id, name='everyone', permissions=0, position=1, guild_id=guild.id
+        id=guild.id, name='everyone', permissions=13312, position=1, guild_id=guild.id
     )
     member = Member(
         user_id=user.id,
