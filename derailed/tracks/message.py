@@ -130,7 +130,9 @@ async def create_message(
         raise HTTPException(404, 'Track not found')
 
     if track.guild_id:
-        permissions = await get_member_permissions(user_id=user.id, guild_id=track.guild_id)
+        permissions = await get_member_permissions(
+            user_id=user.id, guild_id=track.guild_id
+        )
 
         guild = await Guild.find_one(Guild.id == track.guild_id)
 
@@ -213,7 +215,9 @@ async def delete_message(
         raise HTTPException(404, 'Track not found')
 
     if track.guild_id:
-        permissions = await get_member_permissions(user_id=user.id, guild_id=track.guild_id)
+        permissions = await get_member_permissions(
+            user_id=user.id, guild_id=track.guild_id
+        )
 
         guild = await Guild.find_one(Guild.id == track.guild_id)
 

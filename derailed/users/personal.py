@@ -142,7 +142,10 @@ async def get_current_user(
 
 @router.get('/users/{user_id}', status_code=200)
 async def get_user(
-    user_id: str, request: Request, response: Response, user: User | None = Depends(get_user)
+    user_id: str,
+    request: Request,
+    response: Response,
+    user: User | None = Depends(get_user),
 ) -> dict:
     if user is None:
         raise NoAuthorizationError()

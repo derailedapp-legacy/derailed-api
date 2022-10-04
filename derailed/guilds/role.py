@@ -119,7 +119,9 @@ async def create_role(
     if model.permissions is not None:
         for value in RolePermissionEnum:
             if has_bit(model.permissions, value) and not has_bit(permissions, value):
-                raise HTTPException(400, 'You cannot assign roles a permission you don\'t have')
+                raise HTTPException(
+                    400, 'You cannot assign roles a permission you don\'t have'
+                )
 
     if await Role.find_one(
         Role.guild_id == guild_id, Role.position == model.position
@@ -223,7 +225,9 @@ async def modify_role(
     if model.permissions is not None:
         for value in RolePermissionEnum:
             if has_bit(model.permissions, value) and not has_bit(permissions, value):
-                raise HTTPException(400, 'You cannot assign roles a permission you don\'t have')
+                raise HTTPException(
+                    400, 'You cannot assign roles a permission you don\'t have'
+                )
 
     await role.update(**updates)
 
