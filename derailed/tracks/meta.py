@@ -71,9 +71,10 @@ async def modify_track(
         guild = await Guild.find_one(Guild.id == track.guild_id)
 
         is_owner = user.id == guild.owner_id
+        member = await Member.find_one(Member.user_id == user.id, Member.guild_id == track.guild_id)
 
         if (
-            not track_has_bit(permissions, RolePermissionEnum.MODIFY_TRACK.value)
+            not track_has_bit(permissions, RolePermissionEnum.MODIFY_TRACK.value, track, member)
             and not is_owner
         ):
             raise HTTPException(403, 'Invalid permissions')

@@ -16,6 +16,7 @@ from derailed.database import (
     Message,
     Track,
     User,
+    Member,
     get_date,
     get_member_permissions,
     produce,
@@ -56,9 +57,10 @@ async def get_track_messages(
     guild = await Guild.find_one(Guild.id == track.guild_id)
 
     is_owner = user.id == guild.owner_id
+    member = await Member.find_one(Member.user_id == user.id, Member.guild_id == guild.id)
 
     if (
-        not track_has_bit(permissions, RolePermissionEnum.VIEW_MESSAGE_HISTORY.value)
+        not track_has_bit(permissions, RolePermissionEnum.VIEW_MESSAGE_HISTORY.value, track, member)
         and not is_owner
     ):
         raise HTTPException(403, 'Invalid permissions')
@@ -97,9 +99,10 @@ async def get_track_message(
     guild = await Guild.find_one(Guild.id == track.guild_id)
 
     is_owner = user.id == guild.owner_id
+    member = await Member.find_one(Member.user_id == user.id, Member.guild_id == guild.id)
 
     if (
-        not track_has_bit(permissions, RolePermissionEnum.VIEW_MESSAGE_HISTORY.value)
+        not track_has_bit(permissions, RolePermissionEnum.VIEW_MESSAGE_HISTORY.value, track, member)
         and not is_owner
     ):
         raise HTTPException(403, 'Invalid permissions')
@@ -137,9 +140,10 @@ async def create_message(
         guild = await Guild.find_one(Guild.id == track.guild_id)
 
         is_owner = user.id == guild.owner_id
+        member = await Member.find_one(Member.user_id == user.id, Member.guild_id == guild.id)
 
         if (
-            not track_has_bit(permissions, RolePermissionEnum.CREATE_MESSAGE.value)
+            not track_has_bit(permissions, RolePermissionEnum.CREATE_MESSAGE.value, track, member)
             and not is_owner
         ):
             raise HTTPException(403, 'Invalid permissions')
@@ -222,13 +226,14 @@ async def delete_message(
         guild = await Guild.find_one(Guild.id == track.guild_id)
 
         is_owner = user.id == guild.owner_id
+        member = await Member.find_one(Member.user_id == user.id, Member.guild_id == guild.id)
 
     message = await Message.find_one(
         Message.track_id == track_id, Message.id == message_id
     )
 
     if (
-        not track_has_bit(permissions, RolePermissionEnum.DELETE_MESSAGES.value)
+        not track_has_bit(permissions, RolePermissionEnum.DELETE_MESSAGES.value, track, member)
         and not is_owner
         and message.author_id != user.id
     ):

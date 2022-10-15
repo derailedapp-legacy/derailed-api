@@ -160,19 +160,22 @@ async def create_invite(
     if user is None:
         raise NoAuthorizationError()
 
-    if not await Track.find_one(
+    track = await Track.find_one(
         Track.id == track_id, Track.guild_id == guild_id
-    ).exists():
+    )
+
+    if not track:
         raise HTTPException(404, 'Track or Guild not found')
 
     guild = await Guild.find_one(Guild.id == guild_id)
 
     is_owner = user.id == guild.owner_id
+    member = await Member.find_one(Member.user_id == user.id, Member.guild_id == guild_id)
 
     permissions = await get_member_permissions(user_id=user.id, guild_id=guild_id)
 
     if (
-        not track_has_bit(permissions, RolePermissionEnum.CREATE_INVITES.value)
+        not track_has_bit(permissions, RolePermissionEnum.CREATE_INVITES.value, track, member)
         and not is_owner
     ):
         raise HTTPException(403, 'Invalid permissions')
